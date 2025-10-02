@@ -128,14 +128,32 @@ export class LanguageDataService {
 
   /**
    * Transform pie chart data specifically for strategic axes
+   * Uses actual database data (axes_ar) when available, falls back to translation keys
    */
   transformPieChartData(pieData: any[]): any[] {
     if (!pieData) return pieData;
 
-    return pieData.map((item: any) => ({
-      ...item,
-      name: this.translationService.translate(`strategicAxes.${item.name}`) || item.name
-    }));
+    const currentLang = this.translationService.getCurrentLanguage();
+    
+    return pieData.map((item: any) => {
+      let displayName = item.name;
+      
+      if (currentLang === 'ar') {
+        // Try to use axes_ar from database first, then fall back to translation
+        displayName = item.axes_ar || 
+                     item.name_ar || 
+                     this.translationService.translate(`strategicAxes.${item.name}`) || 
+                     item.name;
+      } else {
+        // For French, use the original name or axes field
+        displayName = item.axes || item.name;
+      }
+      
+      return {
+        ...item,
+        name: displayName
+      };
+    });
   }
 
   /**

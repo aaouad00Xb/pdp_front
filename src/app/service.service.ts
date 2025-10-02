@@ -63,10 +63,15 @@ export class ServiceService {
       return this.httpClient.get<string[]>(url, { params: { axes: axes } });
     }
 
-    public findDistinctObjectifsByAxesAr(axesAr: string[]): Observable<string[]> {
-      const url = `${this.apiUrl}/pdp_data/objectifs-ar`;
-      return this.httpClient.get<string[]>(url, { params: { axesAr: axesAr } });
-    }
+  public findDistinctObjectifsByAxesAr(axesAr: string[]): Observable<string[]> {
+    const url = `${this.apiUrl}/pdp_data/objectifs-ar`;
+    return this.httpClient.get<string[]>(url, { params: { axesAr: axesAr } });
+  }
+
+  public getSumOfCoutEstimeByAxeWithArabic(years: number[]): Observable<any[]> {
+    const url = `${this.apiUrl}/pdp_data/getSumOfCoutEstimeByAxeWithArabic`;
+    return this.httpClient.post<any[]>(url, years);
+  }
 
     getObjectifPercentageByObjectifs(objectifs: string[]): Observable<any> {
       const url = `${this.apiUrl}/pdp_data/objectif-percentage-by-objectifs`;
