@@ -68,6 +68,11 @@ export class ServiceService {
     return this.httpClient.get<string[]>(url, { params: { axesAr: axesAr } });
   }
 
+  public findDistinctObjectifsWithArabicByAxes(axes: string[]): Observable<{french: string, arabic: string}[]> {
+    const url = `${this.apiUrl}/pdp_data/objectifs-with-arabic`;
+    return this.httpClient.get<{french: string, arabic: string}[]>(url, { params: { axes: axes } });
+  }
+
   public getSumOfCoutEstimeByAxeWithArabic(years: number[]): Observable<any[]> {
     const url = `${this.apiUrl}/pdp_data/getSumOfCoutEstimeByAxeWithArabic`;
     return this.httpClient.post<any[]>(url, years);

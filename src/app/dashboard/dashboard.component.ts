@@ -101,10 +101,8 @@ onaxesChange(event: Event): void {
   }
 
   // Get objectives for selected axes with mapping for dropdown
-  console.log('Selected axes (from dropdown):', selectedAxes);
   this.languageDataService.getObjectivesWithMapping(selectedAxes).subscribe(
     res => {
-      console.log('Objectives mapping received:', res);
       this.objectifsWithMapping = res;
       this.objectifs = res.map(obj => obj.display); // Keep for backward compatibility
     },

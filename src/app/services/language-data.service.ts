@@ -292,22 +292,14 @@ export class LanguageDataService {
     const currentLang = this.translationService.getCurrentLanguage();
     
     if (currentLang === 'ar') {
-      // Get both French and Arabic objectives using French axes
-      return this.serviceService.findDistinctObjectifsByAxes(frenchAxes).pipe(
-        switchMap(frenchObjectifs => {
-          console.log('French objectives received:', frenchObjectifs);
-          return this.serviceService.findDistinctObjectifsByAxesAr(frenchAxes).pipe(
-            map(arabicObjectifs => {
-              console.log('Arabic objectives received:', arabicObjectifs);
-              // Create mapping objects
-              const mappedObjectifs = frenchObjectifs.map((frenchObj, index) => ({
-                display: arabicObjectifs[index] || frenchObj, // Show Arabic if available, fallback to French
-                value: frenchObj // Always use French for backend
-              }));
-              console.log('Final mapped objectives:', mappedObjectifs);
-              return mappedObjectifs;
-            })
-          );
+      // Get objectives with proper French-Arabic mapping
+      return this.serviceService.findDistinctObjectifsWithArabicByAxes(frenchAxes).pipe(
+        map(objectifsWithArabic => {
+          // Create mapping objects with proper correspondence
+          return objectifsWithArabic.map(obj => ({
+            display: obj.arabic || obj.french, // Show Arabic if available, fallback to French
+            value: obj.french // Always use French for backend
+          }));
         })
       );
     } else {
