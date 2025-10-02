@@ -295,13 +295,17 @@ export class LanguageDataService {
       // Get both French and Arabic objectives using French axes
       return this.serviceService.findDistinctObjectifsByAxes(frenchAxes).pipe(
         switchMap(frenchObjectifs => {
+          console.log('French objectives received:', frenchObjectifs);
           return this.serviceService.findDistinctObjectifsByAxesAr(frenchAxes).pipe(
             map(arabicObjectifs => {
+              console.log('Arabic objectives received:', arabicObjectifs);
               // Create mapping objects
-              return frenchObjectifs.map((frenchObj, index) => ({
+              const mappedObjectifs = frenchObjectifs.map((frenchObj, index) => ({
                 display: arabicObjectifs[index] || frenchObj, // Show Arabic if available, fallback to French
                 value: frenchObj // Always use French for backend
               }));
+              console.log('Final mapped objectives:', mappedObjectifs);
+              return mappedObjectifs;
             })
           );
         })
