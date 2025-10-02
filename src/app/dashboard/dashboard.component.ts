@@ -25,6 +25,12 @@ export class DashboardComponent implements OnDestroy {
   data4: any;
   data3: any;
   data2: any;
+  
+  // Filtered data arrays based on selected years
+  filteredDataByYear: { [year: number]: any[] } = {};
+  
+  // Filtered general data for charts only (not summary cards)
+  filteredGeneralData: any;
   private subscriptions: Subscription[] = [];
   
   // Cached transformed data
@@ -51,21 +57,13 @@ constructor(
 
   this.getAxces();
   this.getchartData()
+  this.getGeneralData() // Use original method for summary cards
   this.getPDPDataByAnneeRealisation1()
   this.getPDPDataByAnneeRealisation2()
   this.getPDPDataByAnneeRealisation3()
   this.getPDPDataByAnneeRealisation4()
   this.getPDPDataByAnneeRealisation5()
   this.getPDPDataByAnneeRealisation6()
-  this.service.getGeneralData().subscribe(
-    res=>{
-       
-      this.generaldata = res
-    },
-    err=>
-    console.error(err)
-    
-  )
 
   // Subscribe to language changes to update axes and objectives
   const langSub = this.translationService.currentLanguage$.subscribe(() => {
@@ -143,26 +141,72 @@ onObjectifsChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const selectedYears = Array.from(target.selectedOptions).map(option => Number(option.value));
   
-    
-  
     if (selectedYears.length === 0) {
       // Handle the case when no regions are selected
       return;
     }
-  
-     
  
     this.years = selectedYears;
   
-    this.getchartData()
+    // Update only chart data when years change (not tables)
+    this.getchartData();
+    this.getGeneralDataByYears(); // Only for the bar chart data
+  }
+
+  getGeneralData() {
+    this.service.getGeneralData().subscribe(
+      res => {
+        this.generaldata = res;
+      },
+      err => console.error(err)
+    );
+  }
+
+  getGeneralDataByYears() {
+    this.service.getGeneralDataByYears(this.years).subscribe(
+      res => {
+        this.filteredGeneralData = res; // Store filtered data separately for charts
+      },
+      err => console.error(err)
+    );
+  }
+
+  // Load data for all selected years
+  loadDataForSelectedYears() {
+    // Clear existing filtered data
+    this.filteredDataByYear = {};
     
-    
+    // Load data for each selected year
+    this.years.forEach(year => {
+      this.service.getPDPDataByAnneeRealisation(year).subscribe(
+        res => {
+          this.filteredDataByYear[year] = this.languageDataService.transformDataForCurrentLanguage(res);
+        },
+        err => console.error(`Error loading data for year ${year}:`, err)
+      );
+    });
+  }
+
+  // Getter methods for filtered data by year
+  get filteredData2022() { return this.years.includes(2022) ? this.filteredDataByYear[2022] || [] : []; }
+  get filteredData2023() { return this.years.includes(2023) ? this.filteredDataByYear[2023] || [] : []; }
+  get filteredData2024() { return this.years.includes(2024) ? this.filteredDataByYear[2024] || [] : []; }
+  get filteredData2025() { return this.years.includes(2025) ? this.filteredDataByYear[2025] || [] : []; }
+  get filteredData2026() { return this.years.includes(2026) ? this.filteredDataByYear[2026] || [] : []; }
+  get filteredData2027() { return this.years.includes(2027) ? this.filteredDataByYear[2027] || [] : []; }
+
+  // Check if a year is selected
+  isYearSelected(year: number): boolean {
+    return this.years.includes(year);
   }
 
   getchartData(){
     this.service.getChartDataWithArabic(this.years).subscribe(
       res=>{
         this.chartsData = res;
+        // Clear cache when chart data changes
+        this._transformedChartData = null;
+        this._chartLegendLabels = [];
         // Update cached data after chart data changes
         this.updateCachedChartData();
             },
@@ -261,6 +305,7 @@ onObjectifsChange(event: Event): void {
     // Re-fetch language-specific data
     this.getAxces();
     this.getchartData();
+    this.getGeneralDataByYears(); // Also refresh filtered chart data
     
     // Transform existing table data
     this.updateDataForLanguage();

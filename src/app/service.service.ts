@@ -58,6 +58,11 @@ export class ServiceService {
       return this.httpClient.get<any>(`${this.apiUrl}/pdp_data/getGeneralData`)
     }
 
+    public getGeneralDataByYears(years: number[]): Observable<any> {
+      const url = `${this.apiUrl}/pdp_data/getGeneralDataByYears`;
+      return this.httpClient.post<any>(url, years);
+    }
+
     public findDistinctObjectifsByAxes(axes: string[]): Observable<string[]> {
       const url = `${this.apiUrl}/pdp_data/objectifs`;
       return this.httpClient.get<string[]>(url, { params: { axes: axes } });
