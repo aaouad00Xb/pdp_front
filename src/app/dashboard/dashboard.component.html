@@ -43,9 +43,12 @@
       <div class="col-2 align-items-center" style=" text-align: center;">
         <img src="assets/image.png" width="100px" alt="" style="display: block; margin: 0 auto;">
       </div>
-      <div class="col-8 title"  > PROGRAMME DE DEVELOPPEMENT PREFECTORAL DE RABAT
+      <div class="col-6 title"  > {{ 'dashboard.title' | translate }}
       </div>
-      <div class="col-2 align-items-center" style="     text-align: center;">
+      <div class="col-2 align-items-center" style="text-align: center;">
+        <app-language-toggle></app-language-toggle>
+      </div>
+      <div class="col-2 align-items-center" style="text-align: center;">
         <img src="assets/image22.png" width="60px" alt="" style="display: block; margin: 0 auto;">
       </div>
   
@@ -53,7 +56,7 @@
       
       
     </div>
-    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">TABLEAU DE BORD <button class="btn btn-sm btn-success" [routerLink]="['/login']">Login</button>
+    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">{{ 'dashboard.title' | translate }} <button class="btn btn-sm btn-success" [routerLink]="['/login']">{{ 'nav.login' | translate }}</button>
     </h3>
   
      </div>
@@ -67,7 +70,7 @@
            
               <table id="customers" >
                 <tr>
-                  <th style="text-align: center;">Coût global du PDP en Mdhs</th>
+                  <th style="text-align: center;">{{ 'dashboard.totalBudget' | translate }}</th>
                 </tr>
     
                 <tr>
@@ -87,7 +90,7 @@
               <table id="customers" >
                 <tr>
     
-                  <th style="text-align: center;">Contribution du CP en Mdhs</th>
+                  <th style="text-align: center;">{{ 'fields.partConseilPrefectoral' | translate }}</th>
                 
                 </tr>
     
@@ -107,7 +110,7 @@
               <table id="customers" >
                 <tr>
     
-                  <th style="text-align: center;">Contribution des partenaires en Mdhs</th>
+                  <th style="text-align: center;">{{ 'fields.partPartenaire' | translate }}</th>
                 
                 </tr>
     
@@ -133,9 +136,9 @@
               <table id="customers2" >
                 <tr>
     
-                  <th>Coût global</th>
-                  <th>Contr.CP</th>
-                  <th>%</th>
+                  <th>{{ 'dashboard.globalCost' | translate }}</th>
+                  <th>{{ 'dashboard.cpContribution' | translate }}</th>
+                  <th>{{ 'dashboard.percentage' | translate }}</th>
                 
                 </tr>
     
@@ -172,7 +175,7 @@
   
         <div class="card">
           <div class="card-body">
-            <app-pie [data1]="chartsData?.piedata"></app-pie>
+            <app-pie [data1]="getTransformedPieData()"></app-pie>
           </div>
         </div>
       
@@ -181,7 +184,7 @@
   
         <div class="card">
           <div class="card-body">
-            <app-bar [data1]="generaldata.groupedSums"></app-bar>
+            <app-bar [data1]="generaldata.groupedSums" [legendLabels]="getChartLegends()"></app-bar>
   
           </div>
         </div>
@@ -209,7 +212,7 @@
   
         <div class="card" >
           <div class="card-header">
-            Axes
+            {{ 'dashboard.byAxes' | translate }}
           </div>
           <div class="card-body">
             <select style="font-size: 6px;height: 29vh;" class="form-select custom-select2" (change)="onaxesChange($event)"  multiple aria-label="Multiple select example">
@@ -223,7 +226,7 @@
   
         <div class="card" >
           <div class="card-header">
-            Objectifs Opérationnels
+            {{ 'dashboard.byObjectives' | translate }}
           </div>
           <div class="card-body">
             <select style="height: 29vh;" class="form-select custom-select2" (change)="onObjectifsChange($event)" multiple aria-label="Multiple select example">
@@ -237,7 +240,7 @@
   
       <div class="card">
         <div class="card-body">
-          <app-pie2 [data1]="piesData[ele]" [label]="ele" ></app-pie2>
+          <app-pie2 [data1]="getTransformedPieData2(ele)" [label]="getTranslatedLabel(ele)" ></app-pie2>
         </div>
       </div>
     
@@ -260,12 +263,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -273,9 +276,9 @@
             <tr *ngFor="let ele of data;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data[i]"></app-barr>
                 
                  </td>
@@ -295,12 +298,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -308,9 +311,9 @@
             <tr *ngFor="let ele of data2;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data2[i]"></app-barr>
                 
                  </td>
@@ -329,12 +332,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -342,9 +345,9 @@
             <tr *ngFor="let ele of data3;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data3[i]"></app-barr>
                 
                  </td>
@@ -363,12 +366,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -376,9 +379,9 @@
             <tr *ngFor="let ele of data4;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data4[i]"></app-barr>
                 
                  </td>
@@ -397,12 +400,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -410,9 +413,9 @@
             <tr *ngFor="let ele of data5;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data5[i]"></app-barr>
                 
                  </td>
@@ -433,12 +436,12 @@
         <table class="table" id="customers12">
           <thead>
       <tr>
-      <th colSpan="1">annee_realisation
+      <th colSpan="1">{{ 'fields.anneeRealisation' | translate }}
       </th>
-      <th colSpan="3">Axes</th>
+      <th colSpan="3">{{ 'fields.axes' | translate }}</th>
       
-      <th colSpan="1">projet_action</th>
-      <th colSpan="3">taux_realisation_physique</th>
+      <th colSpan="1">{{ 'fields.projetAction' | translate }}</th>
+      <th colSpan="3">{{ 'fields.tauxRealisationPhysique' | translate }}</th>
       </tr>
           </thead>
           <tbody>
@@ -446,9 +449,9 @@
             <tr *ngFor="let ele of data6;let i = index">
               <td colSpan="1">{{ele.annee_realisation}}
               </td>
-              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.axes}}</td>
+              <td colSpan="3" style="text-align: center;justify-content: center;">{{ele.displayAxes || ele.axes}}</td>
            
-              <td colSpan="1">{{ele.projet_action}}</td>
+              <td colSpan="1">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td colSpan="3"> <app-barr [data1]="data6[i]"></app-barr>
                 
                  </td>

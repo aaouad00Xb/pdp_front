@@ -1,20 +1,35 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { ServiceService } from '../service.service';
+import { LanguageDataService } from '../services/language-data.service';
+import { TranslationService } from '../services/translation.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-editer',
   templateUrl: './editer.component.html',
   styleUrls: ['./editer.component.css']
 })
-export class EditerComponent {
+export class EditerComponent implements OnDestroy {
   input:any
   data:any=[]
   selectedrow:any
-constructor(private service:ServiceService){
+  private subscriptions: Subscription[] = [];
+
+constructor(
+  private service: ServiceService,
+  private languageDataService: LanguageDataService,
+  private translationService: TranslationService
+) {
   this.gettingData()
+  
+  // Subscribe to language changes to update data display
+  const langSub = this.translationService.currentLanguage$.subscribe(() => {
+    this.updateDataForLanguage();
+  });
+  this.subscriptions.push(langSub);
 }
 @ViewChild('exportTable') exportTable: ElementRef<HTMLTableElement>;
 
@@ -101,7 +116,7 @@ realise
   gettingData(){
 this.service.getData().subscribe(res=>{
    
-  this.data = res
+  this.data = this.languageDataService.transformDataForCurrentLanguage(res);
 },err=>{
   console.log(err)
 })
@@ -186,6 +201,16 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
     
    
     
+  }
+
+  updateDataForLanguage() {
+    if (this.data) {
+      this.data = this.languageDataService.transformDataForCurrentLanguage(this.data);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
   
 }

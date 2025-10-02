@@ -63,6 +63,11 @@ export class ServiceService {
       return this.httpClient.get<string[]>(url, { params: { axes: axes } });
     }
 
+    public findDistinctObjectifsByAxesAr(axesAr: string[]): Observable<string[]> {
+      const url = `${this.apiUrl}/pdp_data/objectifs-ar`;
+      return this.httpClient.get<string[]>(url, { params: { axesAr: axesAr } });
+    }
+
     getObjectifPercentageByObjectifs(objectifs: string[]): Observable<any> {
       const url = `${this.apiUrl}/pdp_data/objectif-percentage-by-objectifs`;
       return this.httpClient.get<any>(url, { params: { objectifs: objectifs } });
@@ -70,6 +75,10 @@ export class ServiceService {
 
     public axes():Observable<any>{
       return this.httpClient.get<any>(`${this.apiUrl}/pdp_data/axes`)
+    }
+
+    public axesAr():Observable<any>{
+      return this.httpClient.get<any>(`${this.apiUrl}/pdp_data/axes-ar`)
     }
 
 

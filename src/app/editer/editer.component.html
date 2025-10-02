@@ -11,9 +11,12 @@
       <div class="col-2 align-items-center" style=" text-align: center;">
         <img src="assets/image.png" width="100px" alt="" style="display: block; margin: 0 auto;">
       </div>
-      <div class="col-8 title"  > PROGRAMME DE DEVELOPPEMENT PREFECTORAL DE RABAT
+      <div class="col-6 title"  > {{ 'editor.title' | translate }}
       </div>
-      <div class="col-2 align-items-center" style="     text-align: center;">
+      <div class="col-2 align-items-center" style="text-align: center;">
+        <app-language-toggle></app-language-toggle>
+      </div>
+      <div class="col-2 align-items-center" style="text-align: center;">
         <img src="assets/image22.png" width="60px" alt="" style="display: block; margin: 0 auto;">
       </div>
   
@@ -21,7 +24,7 @@
       
       
     </div>
-    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">Données <button class="btn btn-danger" [routerLink]="['/dashboard']">retour</button>
+    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">{{ 'nav.editor' | translate }} <button class="btn btn-danger" [routerLink]="['/dashboard']">{{ 'common.cancel' | translate }}</button>
     </h3>
   
      </div>
@@ -53,16 +56,16 @@
           </tr>
           <tr>
           
-            <th >id</th>
-            <th >Axes</th>
-            <th >Objectifs Opérationnels </th>
-            <th >Projets et actions </th>
-            <th >Coût estimé en Mds</th>
-            <th >Part du Conseil Préfectoral </th>
-            <th >Part des partenaires </th>
-            <th >Année de réalisation  </th>
-            <th >Financement  </th>
-            <th >Taux de réalisation (%)  </th>
+            <th >ID</th>
+            <th >{{ 'fields.axes' | translate }}</th>
+            <th >{{ 'fields.objectif' | translate }}</th>
+            <th >{{ 'fields.projetAction' | translate }}</th>
+            <th >{{ 'fields.coutEstime' | translate }}</th>
+            <th >{{ 'fields.partConseilPrefectoral' | translate }}</th>
+            <th >{{ 'fields.partPartenaire' | translate }}</th>
+            <th >{{ 'fields.anneeRealisation' | translate }}</th>
+            <th >{{ 'fields.realise' | translate }}</th>
+            <th >{{ 'fields.tauxRealisationPhysique' | translate }}</th>
            
             <th>Action</th>
 
@@ -75,11 +78,11 @@
        
               <td style="background-color: #FFF5C2;"  >{{ele.id}}</td>
 
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.axes}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayAxes || ele.axes}}</td>
               <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"> <input type="text" class="form-control" [(ngModel)]="ele.axes" ></td>
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.objectif}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayObjectif || ele.objectif}}</td>
               <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.objectif" ></td>
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.projet_action}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayProjetAction || ele.projet_action}}</td>
               <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.projet_action" ></td>
  
               <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.cout_estime" ></td>

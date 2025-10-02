@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ServiceService } from '../service.service';
+import { LanguageDataService } from '../services/language-data.service';
+import { TranslationService } from '../services/translation.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnDestroy {
   years: number[]=[2022,2023,2024,2025,2026,2027];
   generaldata: any;
   chartsData: any;
@@ -20,10 +23,15 @@ export class DashboardComponent {
   data4: any;
   data3: any;
   data2: any;
+  private subscriptions: Subscription[] = [];
 
 
 
-constructor(private service:ServiceService){
+constructor(
+  private service: ServiceService,
+  private languageDataService: LanguageDataService,
+  private translationService: TranslationService
+) {
 
   this.getAxces();
   this.getchartData()
@@ -42,13 +50,20 @@ constructor(private service:ServiceService){
     console.error(err)
     
   )
+
+  // Subscribe to language changes to update axes and objectives
+  const langSub = this.translationService.currentLanguage$.subscribe(() => {
+    this.getAxces();
+    this.updateDataForLanguage();
+  });
+  this.subscriptions.push(langSub);
 }
 
 
 
 
 getAxces(){
-  this.service.axes().subscribe(
+  this.languageDataService.getAxes().subscribe(
     res=> this.axes=res,
     err=>console.error(err)
   )
@@ -69,7 +84,7 @@ onaxesChange(event: Event): void {
    
 
 
-  this.service.findDistinctObjectifsByAxes(selectedYears).subscribe(
+  this.languageDataService.getObjectivesByAxes(selectedYears).subscribe(
     res=>{
        
       this.objectifs=res;
@@ -209,6 +224,55 @@ onObjectifsChange(event: Event): void {
       console.error(err)
       
     )
+  }
+
+  updateDataForLanguage() {
+    // Transform existing data to show appropriate language fields
+    if (this.data) {
+      this.data = this.languageDataService.transformDataForCurrentLanguage(this.data);
+    }
+    if (this.data2) {
+      this.data2 = this.languageDataService.transformDataForCurrentLanguage(this.data2);
+    }
+    if (this.data3) {
+      this.data3 = this.languageDataService.transformDataForCurrentLanguage(this.data3);
+    }
+    if (this.data4) {
+      this.data4 = this.languageDataService.transformDataForCurrentLanguage(this.data4);
+    }
+    if (this.data5) {
+      this.data5 = this.languageDataService.transformDataForCurrentLanguage(this.data5);
+    }
+    if (this.data6) {
+      this.data6 = this.languageDataService.transformDataForCurrentLanguage(this.data6);
+    }
+    
+    // Transform chart data for language
+    if (this.chartsData) {
+      this.chartsData = this.languageDataService.transformChartData(this.chartsData);
+    }
+  }
+
+  getChartLegends(): any {
+    return this.languageDataService.getChartLegends();
+  }
+
+  getTransformedPieData(): any[] {
+    if (!this.chartsData?.piedata) return [];
+    return this.languageDataService.transformPieChartData(this.chartsData.piedata);
+  }
+
+  getTransformedPieData2(key: string): any[] {
+    if (!this.piesData || !this.piesData[key]) return [];
+    return this.languageDataService.transformPieChartData(this.piesData[key]);
+  }
+
+  getTranslatedLabel(label: string): string {
+    return this.translationService.translate(`strategicAxes.${label}`) || label;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
 }

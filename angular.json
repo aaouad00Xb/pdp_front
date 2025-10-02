@@ -26,6 +26,7 @@
             ],
             "styles": [
               "src/styles.css",
+              "src/styles-rtl.css",
               "node_modules/bootstrap-icons/font/bootstrap-icons.css"
 
             ],

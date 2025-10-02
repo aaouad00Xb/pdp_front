@@ -17,6 +17,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { MyCommunePipe } from './my-commune.pipe';
 import { LoginComponent } from './login/login.component';
 import { BarrComponent } from './charts/barr/barr.component';
+import { LanguageToggleComponent } from './components/language-toggle/language-toggle.component';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import { BarrComponent } from './charts/barr/barr.component';
     EditerComponent,
     DashboardComponent,
     MyCommunePipe,
-    BarrComponent
+    BarrComponent,
+    LanguageToggleComponent,
+    TranslatePipe
   ],
   imports: [
     FormsModule,

@@ -27,6 +27,12 @@ export class BarComponent implements OnChanges{
   @Input()
   labels: any[] = [];
 
+  @Input()
+  legendLabels: any = {
+    cpContribution: 'Contribution du conseil préfectoral',
+    estimatedCost: 'Côut estimé en Mds'
+  };
+
 
   ngOnChanges(changes: SimpleChanges): void {
     // Check if data1, data2, data3, or labels have changed
@@ -92,12 +98,12 @@ let partenaire = []
           },
           series: [
             {
-              name: 'Contribution du conseil préfectoral',
+              name: this.legendLabels.cpContribution,
               type: 'bar',
               data: partenaire
             },
             {
-              name: 'Côut estimé en Mds',
+              name: this.legendLabels.estimatedCost,
               type: 'bar',
               data: estime
             }
