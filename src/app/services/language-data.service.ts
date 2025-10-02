@@ -130,6 +130,14 @@ export class LanguageDataService {
       );
     }
 
+    // Transform dataset names (legend labels) for bar chart
+    if (transformedData.dataset) {
+      transformedData.dataset = transformedData.dataset.map((dataset: any) => ({
+        ...dataset,
+        name: this.translateDatasetName(dataset.name)
+      }));
+    }
+
     return transformedData;
   }
 
@@ -171,5 +179,18 @@ export class LanguageDataService {
       cpContribution: this.translationService.translate('dashboard.chartLegends.cpContribution'),
       estimatedCost: this.translationService.translate('dashboard.chartLegends.estimatedCost')
     };
+  }
+
+  /**
+   * Translate dataset names (legend labels) for charts
+   */
+  private translateDatasetName(name: string): string {
+    const translations: { [key: string]: string } = {
+      'estimatedCost': this.translationService.translate('dashboard.chartLegends.estimatedCost'),
+      'cpContribution': this.translationService.translate('dashboard.chartLegends.cpContribution'),
+      'partnerContribution': this.translationService.translate('dashboard.chartLegends.partnerContribution')
+    };
+    
+    return translations[name] || name;
   }
 }

@@ -49,7 +49,8 @@ export class TranslationService {
         percentage: '%',
         chartLegends: {
           cpContribution: 'Contribution du conseil préfectoral',
-          estimatedCost: 'Coût estimé en Mds'
+          estimatedCost: 'Coût estimé en Mds',
+          partnerContribution: 'Contribution des partenaires'
         }
       },
       // Editor
@@ -135,7 +136,8 @@ export class TranslationService {
         percentage: '%',
         chartLegends: {
           cpContribution: 'مساهمة المجلس العمالي',
-          estimatedCost: 'التكلفة المقدرة بالمليون درهم'
+          estimatedCost: 'التكلفة المقدرة بالمليون درهم',
+          partnerContribution: 'مساهمة الشركاء'
         }
       },
       // Editor
