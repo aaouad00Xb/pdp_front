@@ -1,0 +1,115 @@
+
+<div class="content"  >
+
+    <!-- Highlight Card -->
+     <div class="container">
+      <div class="row bar"
+      style="
+        border-radius: 10px;
+        color: white;
+      ">
+      <div class="col-2 align-items-center" style=" text-align: center;">
+        <img src="assets/image.png" width="100px" alt="" style="display: block; margin: 0 auto;">
+      </div>
+      <div class="col-8 title"  > PROGRAMME DE DEVELOPPEMENT PREFECTORAL DE RABAT
+      </div>
+      <div class="col-2 align-items-center" style="     text-align: center;">
+        <img src="assets/image22.png" width="60px" alt="" style="display: block; margin: 0 auto;">
+      </div>
+  
+     
+      
+      
+    </div>
+    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">Données <button class="btn btn-danger" [routerLink]="['/dashboard']">retour</button>
+    </h3>
+  
+     </div>
+   
+   
+   
+    <div class="container">
+        <div class="input-group mb-3">
+            <label for="">Multi-Filtre :</label>
+            <input type="text" class="form-control" placeholder="filtrer suivant tout les colonnes" [(ngModel)]="input" id="">
+            <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
+      
+        </div>
+
+        <div class="input-group mb-3">
+           
+          <button class="btn btn-primary" (click)="add()"><i class="bi bi-patch-plus-fill">Ajouter</i> </button>    
+          <button class="btn btn-success mt-3" style="width: 100%;"   (click)="exportTableToExcel()"><i class="bi bi-file-earmark-spreadsheet"></i> exporter</button>
+
+        </div>
+
+<div class="table-responsive" #exportTable>
+    <table id="customers">
+        <thead>
+          <tr>
+            
+            <th colspan="15" >Réclamations</th>
+
+          </tr>
+          <tr>
+          
+            <th >id</th>
+            <th >Axes</th>
+            <th >Objectifs Opérationnels </th>
+            <th >Projets et actions </th>
+            <th >Coût estimé en Mds</th>
+            <th >Part du Conseil Préfectoral </th>
+            <th >Part des partenaires </th>
+            <th >Année de réalisation  </th>
+            <th >Financement  </th>
+            <th >Taux de réalisation (%)  </th>
+           
+            <th>Action</th>
+
+          </tr>
+        </thead>
+        <tbody>
+          
+           
+            <tr *ngFor="let ele of data| myCommune:input; ">
+       
+              <td style="background-color: #FFF5C2;"  >{{ele.id}}</td>
+
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.axes}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"> <input type="text" class="form-control" [(ngModel)]="ele.axes" ></td>
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.objectif}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.objectif" ></td>
+              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.projet_action}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.projet_action" ></td>
+ 
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.cout_estime" ></td>
+              <td [ngClass]="ele.cout_estime ==0?'class1':'class2' " *ngIf="!ele.expanded">{{ele.cout_estime}}</td>
+
+              <td   [ngClass]="ele.part_conseil_prefectoral ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.part_conseil_prefectoral}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.part_conseil_prefectoral" ></td>
+              <td [ngClass]="ele.part_partenaire ==0?'class1':'class2' " *ngIf="!ele.expanded">{{ele.part_partenaire}}</td>
+
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.part_partenaire" ></td>
+              <td style="background-color: #FFF5C2;"    *ngIf="!ele.expanded">{{ele.annee_realisation}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.annee_realisation" ></td>
+               
+              <td [ngClass]="ele.realise ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.realise}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.realise" ></td>
+
+              <td [ngClass]="ele.taux_realisation_physique ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.taux_realisation_physique}}</td>
+              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.taux_realisation_physique" ></td>
+ 
+              <td  style="background-color: #6db9ef60;">
+                <i *ngIf="ele.expanded && !ele.id"  class="bi bi-check-circle m-1" (click)="addnew();ele.expanded = !ele.expanded;"></i>
+
+                <i *ngIf="ele.expanded && ele.id"  class="bi bi-check-circle m-1" (click)="updaterow();ele.expanded = !ele.expanded;"></i>
+                <i *ngIf="  ele.id"  class="bi bi-pencil-square m-1" (click)="ele.expanded = !ele.expanded;selectedrow = ele"></i>
+                <i *ngIf="  ele.id" class="bi bi-trash3-fill m-1" (click)="selectedrow = ele;verify()"></i>
+              </td>
+            </tr>
+       
+        </tbody>
+      </table>
+</div>
+    
+    </div>
