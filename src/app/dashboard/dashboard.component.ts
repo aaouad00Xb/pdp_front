@@ -24,6 +24,11 @@ export class DashboardComponent implements OnDestroy {
   data3: any;
   data2: any;
   private subscriptions: Subscription[] = [];
+  
+  // Cached transformed data
+  private _transformedChartData: any = null;
+  private _chartLegendLabels: string[] = [];
+  private _lastLanguage: string = '';
 
 
 
@@ -53,8 +58,7 @@ constructor(
 
   // Subscribe to language changes to update axes and objectives
   const langSub = this.translationService.currentLanguage$.subscribe(() => {
-    this.getAxces();
-    this.updateDataForLanguage();
+    this.refreshAllDataForLanguage();
   });
   this.subscriptions.push(langSub);
 }
@@ -226,6 +230,20 @@ onObjectifsChange(event: Event): void {
     )
   }
 
+  refreshAllDataForLanguage() {
+    // Clear cached data
+    this._transformedChartData = null;
+    this._chartLegendLabels = [];
+    this._lastLanguage = this.translationService.getCurrentLanguage();
+    
+    // Re-fetch language-specific data
+    this.getAxces();
+    this.getchartData();
+    
+    // Transform existing table data
+    this.updateDataForLanguage();
+  }
+
   updateDataForLanguage() {
     // Transform existing data to show appropriate language fields
     if (this.data) {
@@ -245,11 +263,6 @@ onObjectifsChange(event: Event): void {
     }
     if (this.data6) {
       this.data6 = this.languageDataService.transformDataForCurrentLanguage(this.data6);
-    }
-    
-    // Transform chart data for language
-    if (this.chartsData) {
-      this.chartsData = this.languageDataService.transformChartData(this.chartsData);
     }
   }
 
@@ -273,7 +286,25 @@ onObjectifsChange(event: Event): void {
 
   getTransformedChartData(): any {
     if (!this.chartsData) return null;
-    return this.languageDataService.transformChartData(this.chartsData);
+    
+    const currentLang = this.translationService.getCurrentLanguage();
+    if (!this._transformedChartData || this._lastLanguage !== currentLang) {
+      this._transformedChartData = this.languageDataService.transformChartData(this.chartsData);
+      this._lastLanguage = currentLang;
+    }
+    
+    return this._transformedChartData;
+  }
+
+  getChartLegendLabels(): string[] {
+    const currentLang = this.translationService.getCurrentLanguage();
+    if (this._chartLegendLabels.length === 0 || this._lastLanguage !== currentLang) {
+      const transformedData = this.getTransformedChartData();
+      if (transformedData && transformedData.dataset) {
+        this._chartLegendLabels = transformedData.dataset.map((dataset: any) => dataset.name);
+      }
+    }
+    return this._chartLegendLabels;
   }
 
   ngOnDestroy(): void {

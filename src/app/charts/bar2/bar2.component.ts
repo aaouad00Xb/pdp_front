@@ -27,6 +27,9 @@ export class Bar2Component implements OnChanges{
   @Input()
   labels: any[] = [];
 
+  @Input()
+  legendLabels: string[] = [];
+
 
   ngOnChanges(changes: SimpleChanges): void {
     // Check if data1, data2, data3, or labels have changed
@@ -85,7 +88,7 @@ export class Bar2Component implements OnChanges{
             }
           },
           legend: {
-            data: ['Côut estimé en Mds', 'Contribution du CP', 'Contribution des aprtenaires']
+            data: this.legendLabels.length > 0 ? this.legendLabels : ['Côut estimé en Mds', 'Contribution du CP', 'Contribution des aprtenaires']
           },
           toolbox: {
             show: true,

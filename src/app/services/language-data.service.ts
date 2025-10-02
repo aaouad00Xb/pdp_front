@@ -43,11 +43,20 @@ export class LanguageDataService {
   getLocalizedField(item: any, fieldName: string): string {
     const currentLang = this.translationService.getCurrentLanguage();
     
+    console.log(`Getting localized field: ${fieldName}, language: ${currentLang}`);
+    console.log(`Item keys:`, Object.keys(item));
+    
     if (currentLang === 'ar') {
       const arabicField = item[fieldName + '_ar'];
+      console.log(`Arabic field (${fieldName}_ar):`, arabicField);
+      console.log(`French field (${fieldName}):`, item[fieldName]);
+      
       // Fallback to French if Arabic is not available
-      return arabicField && arabicField.trim() !== '' ? arabicField : item[fieldName];
+      const result = arabicField && arabicField.trim() !== '' ? arabicField : item[fieldName];
+      console.log(`Returning:`, result);
+      return result;
     } else {
+      console.log(`Returning French:`, item[fieldName]);
       return item[fieldName];
     }
   }
@@ -80,6 +89,12 @@ export class LanguageDataService {
    * Transform data array to show appropriate language fields
    */
   transformDataForCurrentLanguage(data: any[]): any[] {
+    if (!data || data.length === 0) return data;
+    
+    const currentLang = this.translationService.getCurrentLanguage();
+    console.log('Transforming data for language:', currentLang);
+    console.log('Sample data item:', data[0]);
+    
     return data.map(item => ({
       ...item,
       displayAxes: this.getLocalizedField(item, 'axes'),
