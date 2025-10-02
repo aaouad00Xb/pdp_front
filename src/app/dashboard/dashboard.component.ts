@@ -148,7 +148,7 @@ onObjectifsChange(event: Event): void {
   }
 
   getchartData(){
-    this.service.getChartData(this.years).subscribe(
+    this.service.getChartDataWithArabic(this.years).subscribe(
       res=>{
         this.chartsData = res
             },
@@ -269,6 +269,11 @@ onObjectifsChange(event: Event): void {
 
   getTranslatedLabel(label: string): string {
     return this.translationService.translate(`strategicAxes.${label}`) || label;
+  }
+
+  getTransformedChartData(): any {
+    if (!this.chartsData) return null;
+    return this.languageDataService.transformChartData(this.chartsData);
   }
 
   ngOnDestroy(): void {

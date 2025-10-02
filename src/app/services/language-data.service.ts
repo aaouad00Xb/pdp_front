@@ -123,6 +123,13 @@ export class LanguageDataService {
       }));
     }
 
+    // Transform objectives (projetActions) for bar chart
+    if (transformedData.projetActionsWithArabic && currentLang === 'ar') {
+      transformedData.projetActions = transformedData.projetActionsWithArabic.map((item: any) => 
+        item.objectif_ar || item.name
+      );
+    }
+
     return transformedData;
   }
 

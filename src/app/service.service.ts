@@ -90,6 +90,10 @@ export class ServiceService {
     public getChartData(data:any):Observable<any>{
       return this.httpClient.post<any>(`${this.apiUrl}/pdp_data/getChartData`,data)
     }
+
+    public getChartDataWithArabic(data:any):Observable<any>{
+      return this.httpClient.post<any>(`${this.apiUrl}/pdp_data/getChartDataWithArabic`,data)
+    }
     
 
     public updatePDP_DATA(id:any,data:any):Observable<any>{
