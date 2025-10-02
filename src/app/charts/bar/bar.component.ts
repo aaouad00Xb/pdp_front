@@ -100,12 +100,22 @@ let partenaire = []
             {
               name: this.legendLabels.cpContribution,
               type: 'bar',
-              data: partenaire
+              data: partenaire,
+              label: {
+                show: true,
+                position: 'right',
+                formatter: '{c} MDH'
+              }
             },
             {
               name: this.legendLabels.estimatedCost,
               type: 'bar',
-              data: estime
+              data: estime,
+              label: {
+                show: true,
+                position: 'right',
+                formatter: '{c} MDH'
+              }
             }
           ]
         };
@@ -262,12 +272,22 @@ this.option = {
     {
       name: '2011',
       type: 'bar',
-      data: [18203, 23489, 29034, 104970, 131744, 630230]
+      data: [18203, 23489, 29034, 104970, 131744, 630230],
+      label: {
+        show: true,
+        position: 'right',
+        formatter: '{c} MDH'
+      }
     },
     {
       name: '2012',
       type: 'bar',
-      data: [19325, 23438, 31000, 121594, 134141, 681807]
+      data: [19325, 23438, 31000, 121594, 134141, 681807],
+      label: {
+        show: true,
+        position: 'right',
+        formatter: '{c} MDH'
+      }
     }
   ]
 };
