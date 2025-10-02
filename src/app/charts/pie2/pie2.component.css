@@ -1,9 +1,56 @@
 
 
 
-#pie{
-   background-color: #bfd7542c;
+#pie {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     left: 0;
-    height: 50vh;
+    height: 280px;
     width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+#pie:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+#pie::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+    z-index: 1;
+}
+
+.echarts {
+    padding: 8px;
+    height: 100%;
+    width: 100%;
+}
+
+/* Responsive height adjustments */
+@media (max-width: 1400px) {
+    #pie {
+        height: 260px;
+    }
+}
+
+@media (max-width: 992px) {
+    #pie {
+        height: 300px;
+    }
+}
+
+@media (max-width: 768px) {
+    #pie {
+        height: 320px;
+    }
 }

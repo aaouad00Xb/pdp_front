@@ -1,3 +1,14 @@
-<div echarts  id="bar" [options]="option" class="echarts"></div>
+<!-- ECharts Progress Bar -->
+<div *ngIf="option" echarts [options]="option" class="echarts" style="height: 50px; width: 100%;"></div>
+
+<!-- Fallback CSS Progress Bar -->
+<div *ngIf="!option || !data1" class="progress-bar-container">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" [style.width.%]="data1?.taux_realisation_physique || 0">
+      <span class="progress-text">{{(data1?.taux_realisation_physique || 0)}}%</span>
+    </div>
+  </div>
+  <div class="progress-label">محقق</div>
+</div>
 
 

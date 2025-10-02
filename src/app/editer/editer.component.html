@@ -32,87 +32,382 @@
    
    
     <div class="container">
-        <div class="input-group mb-3">
-            <label for="">Multi-Filtre :</label>
-            <input type="text" class="form-control" placeholder="filtrer suivant tout les colonnes" [(ngModel)]="input" id="">
-            <span class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></span>
-      
-        </div>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4">
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="activeTab === 'table'"
+                    (click)="activeTab = 'table'">
+              <i class="bi bi-table"></i> Gestion des Données
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="activeTab === 'import'"
+                    (click)="activeTab = 'import'">
+              <i class="bi bi-cloud-upload"></i> Import Excel
+            </button>
+          </li>
+        </ul>
 
-        <div class="input-group mb-3">
+        <!-- Tab Content -->
+        <div class="tab-content">
+          
+          <!-- Debug info -->
+          <div class="alert alert-info mb-3">
+            <small>Active Tab: {{activeTab}} | Data Length: {{data?.length || 0}}</small>
+          </div>
+          
+          <!-- Table Management Tab -->
+          <div *ngIf="activeTab === 'table'">
            
-          <button class="btn btn-primary" (click)="add()"><i class="bi bi-patch-plus-fill">Ajouter</i> </button>    
-          <button class="btn btn-success mt-3" style="width: 100%;"   (click)="exportTableToExcel()"><i class="bi bi-file-earmark-spreadsheet"></i> exporter</button>
+ 
 
+            <!-- Action Buttons Section -->
+            <div class="action-buttons-section mb-4">
+              <div class="card">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0"><i class="bi bi-tools"></i> Actions</h6>
+                </div>
+                <div class="card-body p-3">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <button class="btn btn-primary btn-action w-100" (click)="add()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        <span>Ajouter une ligne</span>
+                      </button>
+                    </div>
+                    <div class="col-md-6">
+                      <button class="btn btn-success btn-action w-100" (click)="exportTableToExcel()">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
+                        <span>Exporter Excel</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="row g-3 mt-2">
+                    <div class="col-12">
+                      <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
+                        <small class="text-muted">
+                          <i class="bi bi-info-circle me-1"></i>
+                          Total des enregistrements: <strong>{{data?.length || 0}}</strong>
+                        </small>
+                        <small class="text-muted">
+                          <i class="bi bi-funnel me-1"></i>
+                          Filtré: <strong>{{getAllFilteredData().length}}</strong>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simple Filters -->
+            <div class="filters-section mb-3">
+              <div class="row">
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.id" placeholder="Filtrer par ID">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes" placeholder="Axes (FR)">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes_ar" placeholder="المحاور" dir="rtl">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif" placeholder="Objectifs (FR)">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif_ar" placeholder="الأهداف" dir="rtl">
+                </div>
+                <div class="col-md-2">
+                  <select class="form-control form-control-sm" [(ngModel)]="filters.annee_realisation">
+                    <option value="">Toutes années</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action" placeholder="Projets (FR)">
+                </div>
+                <div class="col-md-2">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action_ar" placeholder="المشاريع" dir="rtl">
+                </div>
+                <div class="col-md-2">
+                  <button class="btn btn-secondary btn-sm" (click)="clearFilters()">
+                    <i class="bi bi-x-circle"></i> Effacer
+                  </button>
+                </div>
+                <div class="col-md-6 text-right">
+                  <small class="text-muted">
+                    Affichage {{getStartIndex()}}-{{getEndIndex()}} sur {{getAllFilteredData().length}} éléments
+                  </small>
+                </div>
+              </div>
         </div>
 
-<div class="table-responsive" #exportTable>
-    <table id="customers">
+            <!-- Data Table -->
+            <div class="table-container-scrollable">
+              <div class="table-responsive table-scroll">
+                <table id="customers-simple" class="table table-striped table-fixed" #exportTable>
         <thead>
           <tr>
-            
-            <th colspan="15" >Réclamations</th>
-
+                      <th colspan="14">{{ 'editor.title' | translate }}</th>
           </tr>
           <tr>
-          
-            <th >ID</th>
-            <th >{{ 'fields.axes' | translate }}</th>
-            <th >{{ 'fields.objectif' | translate }}</th>
-            <th >{{ 'fields.projetAction' | translate }}</th>
-            <th >{{ 'fields.coutEstime' | translate }}</th>
-            <th >{{ 'fields.partConseilPrefectoral' | translate }}</th>
-            <th >{{ 'fields.partPartenaire' | translate }}</th>
-            <th >{{ 'fields.anneeRealisation' | translate }}</th>
-            <th >{{ 'fields.realise' | translate }}</th>
-            <th >{{ 'fields.tauxRealisationPhysique' | translate }}</th>
-           
-            <th>Action</th>
-
+                      <th class="sortable" (click)="sortBy('id')">
+                        ID <i class="bi" [ngClass]="getSortIcon('id')"></i>
+                      </th>
+                      <th class="french-col sortable" (click)="sortBy('axes')">
+                        {{ 'fields.axes' | translate }} (FR) <i class="bi" [ngClass]="getSortIcon('axes')"></i>
+                      </th>
+                      <th class="arabic-col sortable" (click)="sortBy('axes_ar')">
+                        {{ 'fields.axes' | translate }} (AR) <i class="bi" [ngClass]="getSortIcon('axes_ar')"></i>
+                      </th>
+                      <th class="french-col sortable" (click)="sortBy('objectif')">
+                        {{ 'fields.objectif' | translate }} (FR) <i class="bi" [ngClass]="getSortIcon('objectif')"></i>
+                      </th>
+                      <th class="arabic-col sortable" (click)="sortBy('objectif_ar')">
+                        {{ 'fields.objectif' | translate }} (AR) <i class="bi" [ngClass]="getSortIcon('objectif_ar')"></i>
+                      </th>
+                      <th class="french-col sortable" (click)="sortBy('projet_action')">
+                        {{ 'fields.projetAction' | translate }} (FR) <i class="bi" [ngClass]="getSortIcon('projet_action')"></i>
+                      </th>
+                      <th class="arabic-col sortable" (click)="sortBy('projet_action_ar')">
+                        {{ 'fields.projetAction' | translate }} (AR) <i class="bi" [ngClass]="getSortIcon('projet_action_ar')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('cout_estime')">
+                        {{ 'fields.coutEstime' | translate }} <i class="bi" [ngClass]="getSortIcon('cout_estime')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('part_conseil_prefectoral')">
+                        {{ 'fields.partConseilPrefectoral' | translate }} <i class="bi" [ngClass]="getSortIcon('part_conseil_prefectoral')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('part_partenaire')">
+                        {{ 'fields.partPartenaire' | translate }} <i class="bi" [ngClass]="getSortIcon('part_partenaire')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('annee_realisation')">
+                        {{ 'fields.anneeRealisation' | translate }} <i class="bi" [ngClass]="getSortIcon('annee_realisation')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('realise')">
+                        {{ 'fields.realise' | translate }} <i class="bi" [ngClass]="getSortIcon('realise')"></i>
+                      </th>
+                      <th class="sortable" (click)="sortBy('taux_realisation_physique')">
+                        {{ 'fields.tauxRealisationPhysique' | translate }} <i class="bi" [ngClass]="getSortIcon('taux_realisation_physique')"></i>
+                      </th>
+                      <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          
-           
-            <tr *ngFor="let ele of data| myCommune:input; ">
-       
-              <td style="background-color: #FFF5C2;"  >{{ele.id}}</td>
+                      <tr *ngFor="let ele of getFilteredData()" [ngClass]="{'table-warning': ele.expanded}">
+                        <td>{{ele.id}}</td>
+                        
+                        <!-- French Axes -->
+                        <td class="french-cell" *ngIf="!ele.expanded">{{ele.axes}}</td>
+                        <td class="french-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.axes" rows="3"></textarea>
+                        </td>
+                        
+                        <!-- Arabic Axes -->
+                        <td class="arabic-cell" *ngIf="!ele.expanded">{{ele.axes_ar}}</td>
+                        <td class="arabic-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.axes_ar" dir="rtl" rows="3"></textarea>
+                        </td>
+                        
+                        <!-- French Objectif -->
+                        <td class="french-cell" *ngIf="!ele.expanded">{{ele.objectif}}</td>
+                        <td class="french-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.objectif" rows="3"></textarea>
+                        </td>
+                        
+                        <!-- Arabic Objectif -->
+                        <td class="arabic-cell" *ngIf="!ele.expanded">{{ele.objectif_ar}}</td>
+                        <td class="arabic-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.objectif_ar" dir="rtl" rows="3"></textarea>
+                        </td>
+                        
+                        <!-- French Projet Action -->
+                        <td class="french-cell" *ngIf="!ele.expanded">{{ele.projet_action}}</td>
+                        <td class="french-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.projet_action" rows="3"></textarea>
+                        </td>
+                        
+                        <!-- Arabic Projet Action -->
+                        <td class="arabic-cell" *ngIf="!ele.expanded">{{ele.projet_action_ar}}</td>
+                        <td class="arabic-cell" *ngIf="ele.expanded">
+                          <textarea class="form-control form-control-sm textarea-edit" [(ngModel)]="ele.projet_action_ar" dir="rtl" rows="3"></textarea>
+                        </td>
 
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayAxes || ele.axes}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"> <input type="text" class="form-control" [(ngModel)]="ele.axes" ></td>
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayObjectif || ele.objectif}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.objectif" ></td>
-              <td style="background-color: #FFF5C2;"     *ngIf="!ele.expanded">{{ele.displayProjetAction || ele.projet_action}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="text" class="form-control" [(ngModel)]="ele.projet_action" ></td>
- 
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.cout_estime" ></td>
-              <td [ngClass]="ele.cout_estime ==0?'class1':'class2' " *ngIf="!ele.expanded">{{ele.cout_estime}}</td>
+                        <!-- Numeric Fields -->
+                        <td *ngIf="!ele.expanded">{{ele.cout_estime}}</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.cout_estime">
+                        </td>
 
-              <td   [ngClass]="ele.part_conseil_prefectoral ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.part_conseil_prefectoral}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.part_conseil_prefectoral" ></td>
-              <td [ngClass]="ele.part_partenaire ==0?'class1':'class2' " *ngIf="!ele.expanded">{{ele.part_partenaire}}</td>
+                        <td *ngIf="!ele.expanded">{{ele.part_conseil_prefectoral}}</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.part_conseil_prefectoral">
+                        </td>
 
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.part_partenaire" ></td>
-              <td style="background-color: #FFF5C2;"    *ngIf="!ele.expanded">{{ele.annee_realisation}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.annee_realisation" ></td>
-               
-              <td [ngClass]="ele.realise ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.realise}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.realise" ></td>
+                        <td *ngIf="!ele.expanded">{{ele.part_partenaire}}</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.part_partenaire">
+                        </td>
 
-              <td [ngClass]="ele.taux_realisation_physique ==0?'class1':'class2' "  *ngIf="!ele.expanded">{{ele.taux_realisation_physique}}</td>
-              <td style="background-color: #FFF5C2;"     *ngIf="ele.expanded"><input type="number" class="form-control" [(ngModel)]="ele.taux_realisation_physique" ></td>
- 
-              <td  style="background-color: #6db9ef60;">
-                <i *ngIf="ele.expanded && !ele.id"  class="bi bi-check-circle m-1" (click)="addnew();ele.expanded = !ele.expanded;"></i>
+                        <td *ngIf="!ele.expanded">{{ele.annee_realisation}}</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.annee_realisation">
+                        </td>
+                         
+                        <td *ngIf="!ele.expanded">{{ele.realise}}</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.realise">
+                        </td>
 
-                <i *ngIf="ele.expanded && ele.id"  class="bi bi-check-circle m-1" (click)="updaterow();ele.expanded = !ele.expanded;"></i>
-                <i *ngIf="  ele.id"  class="bi bi-pencil-square m-1" (click)="ele.expanded = !ele.expanded;selectedrow = ele"></i>
-                <i *ngIf="  ele.id" class="bi bi-trash3-fill m-1" (click)="selectedrow = ele;verify()"></i>
+                        <td *ngIf="!ele.expanded">{{ele.taux_realisation_physique}}%</td>
+                        <td *ngIf="ele.expanded">
+                          <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.taux_realisation_physique">
+                        </td>
+
+                        <!-- Actions -->
+                        <td>
+                          <button *ngIf="ele.expanded && !ele.id" class="btn btn-success btn-sm me-1" 
+                                  (click)="addnew();ele.expanded = !ele.expanded;">
+                            <i class="bi bi-check"></i>
+                          </button>
+                          <button *ngIf="ele.expanded && ele.id" class="btn btn-success btn-sm me-1" 
+                                  (click)="updaterow();ele.expanded = !ele.expanded;">
+                            <i class="bi bi-check"></i>
+                          </button>
+                          <button *ngIf="ele.id && !ele.expanded" class="btn btn-primary btn-sm me-1" 
+                                  (click)="ele.expanded = !ele.expanded;selectedrow = ele">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button *ngIf="ele.id && !ele.expanded" class="btn btn-danger btn-sm" 
+                                  (click)="selectedrow = ele;verify()">
+                            <i class="bi bi-trash"></i>
+                          </button>
               </td>
             </tr>
-       
         </tbody>
       </table>
+              </div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="pagination-section mt-3" *ngIf="getTotalPages() > 1">
+              <nav aria-label="Table pagination">
+                <ul class="pagination justify-content-center mb-0">
+                  <!-- Previous Button -->
+                  <li class="page-item" [class.disabled]="currentPage === 1">
+                    <button class="page-link" (click)="previousPage()" [disabled]="currentPage === 1">
+                      <i class="bi bi-chevron-left"></i> Précédent
+                    </button>
+                  </li>
+                  
+                  <!-- Page Numbers -->
+                  <li class="page-item" 
+                      *ngFor="let page of getPageNumbers()" 
+                      [class.active]="page === currentPage">
+                    <button class="page-link" (click)="goToPage(page)">
+                      {{page}}
+                    </button>
+                  </li>
+                  
+                  <!-- Next Button -->
+                  <li class="page-item" [class.disabled]="currentPage === getTotalPages()">
+                    <button class="page-link" (click)="nextPage()" [disabled]="currentPage === getTotalPages()">
+                      Suivant <i class="bi bi-chevron-right"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+              
+              <!-- Pagination Info -->
+              <div class="text-center mt-2">
+                <small class="text-muted">
+                  Page {{currentPage}} sur {{getTotalPages()}} 
+                  ({{getAllFilteredData().length}} éléments au total)
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Import Excel Tab -->
+          <div *ngIf="activeTab === 'import'">
+            <h3>Import Excel Content</h3>
+            <p>This is the import tab content.</p>
+            
+            <div class="upload-section">
+              <div class="card">
+                <div class="card-header bg-info text-white">
+                  <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Import de Données Excel</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <label class="form-label">Télécharger un fichier Excel (.xlsx)</label>
+                      <input type="file" 
+                             class="form-control" 
+                             accept=".xlsx,.xls" 
+                             (change)="onFileSelected($event)"
+                             #fileInput>
+                      <small class="text-muted">Format accepté: .xlsx, .xls (Max: 10MB)</small>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Télécharger le modèle</label>
+                      <br>
+                      <button class="btn btn-outline-info btn-sm" (click)="downloadTemplate()">
+                        <i class="bi bi-download"></i> Télécharger modèle Excel
+                      </button>
+                      <small class="d-block text-muted mt-1">Utilisez ce modèle pour formater vos données</small>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-3" *ngIf="uploadProgress > 0">
+                    <div class="progress">
+                      <div class="progress-bar" 
+                           [style.width.%]="uploadProgress" 
+                           [ngClass]="{'bg-success': uploadProgress === 100, 'bg-info': uploadProgress < 100}">
+                        {{uploadProgress}}%
+                      </div>
+                    </div>
+                    <small class="text-muted">{{uploadStatus}}</small>
+                  </div>
+
+                  <div class="mt-3" *ngIf="selectedFile">
+                    <div class="alert alert-info">
+                      <strong>Fichier sélectionné:</strong> {{selectedFile.name}} ({{getFileSize(selectedFile.size)}})
+                      <button class="btn btn-success btn-sm ms-2" (click)="uploadFile()" [disabled]="uploading">
+                        <i class="bi bi-upload"></i> 
+                        <span *ngIf="!uploading">Importer</span>
+                        <span *ngIf="uploading">Importation...</span>
+                      </button>
+                      <button class="btn btn-secondary btn-sm ms-1" (click)="clearFile()">
+                        <i class="bi bi-x"></i> Annuler
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Instructions -->
+                  <div class="mt-4">
+                    <h6><i class="bi bi-info-circle"></i> Instructions:</h6>
+                    <ol class="small text-muted">
+                      <li>Téléchargez le modèle Excel pour voir le format requis</li>
+                      <li>Remplissez vos données dans le modèle</li>
+                      <li>Assurez-vous que toutes les colonnes obligatoires sont remplies</li>
+                      <li>Sélectionnez votre fichier et cliquez sur "Importer"</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 </div>
     
     </div>

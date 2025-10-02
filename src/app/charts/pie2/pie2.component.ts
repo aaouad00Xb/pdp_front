@@ -22,8 +22,19 @@ export class Pie2Component {
   label: any;
   colorList
   constructor() {
-     this.colorList = ['#164B60', '#1B6B93', '#4FC0D0', '#A2FF86', '#EF6262', '#F3AA60',"#F7B787","#5C8374",'#FF9800'];
-
+     // Professional color palette with better contrast and modern look
+     this.colorList = [
+       '#2E86AB', // Professional blue
+       '#A23B72', // Deep magenta
+       '#F18F01', // Vibrant orange
+       '#C73E1D', // Rich red
+       '#6A994E', // Forest green
+       '#7209B7', // Royal purple
+       '#F77F00', // Amber
+       '#D62828', // Crimson
+       '#003566', // Navy blue
+       '#8B5CF6'  // Modern purple
+     ];
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -61,66 +72,90 @@ export class Pie2Component {
       if(this.option){
         this.option = {
           title: {
-            text: this.label,
-            left: 'center',
-            top: 15,
-            textStyle: {
-              color: 'black'
-            }
+            show: false // Hide title since it's now shown outside the chart
           },
           tooltip: {
-            trigger: 'item'
+            trigger: 'item',
+            backgroundColor: 'rgba(50, 50, 50, 0.95)',
+            borderColor: 'transparent',
+            textStyle: {
+              color: '#fff',
+              fontSize: 12,
+              fontFamily: 'Tahoma, sans-serif'
+            },
+            formatter: '{a} <br/>{b}: {c}% ({d}%)',
+            extraCssText: 'border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);'
           },
         
         
           legend: {
-             top: '70%',
+             top: '80%',
             left: 'center',
-            bottom: 0, 
-            textStyle: {
-              fontSize: 9 // Adjust the font size of the legend
-            },
+            bottom: 5, 
+    textStyle: {
+      fontSize: 9,
+      color: '#4a5568',
+      fontFamily: 'Tahoma, sans-serif'
+    },
             formatter: function (name) {
-              // Convert the labels to strings or apply any desired formatting
-              return name.toString().substring(0,30)+"..."; // Convert the label to a string
-          }
+              return name.toString().length > 20 ? name.toString().substring(0,20)+"..." : name.toString();
+            },
+            itemWidth: 10,
+            itemHeight: 10,
+            itemGap: 6
           },
           series: [
             {
-              name: '--',
+              name: 'Réalisation',
               type: 'pie',
-              radius: ['30%', '45%'],
+              radius: ['40%', '65%'],
+              center: ['50%', '50%'],
               avoidLabelOverlap: false,
               label: {
-                show: true, // Set to true to show labels
-                position: 'inside', // Adjust the label position as per your requirement
-                distanceToLabelLine: -10, // Adjust the distance of the labels from the label lines
-        
-                formatter: '{c} %' // Format the label as per your requirement
+                show: true,
+                position: 'inside',
+                fontSize: 11,
+                fontWeight: '600',
+                color: '#fff',
+                fontFamily: 'Tahoma, sans-serif',
+                formatter: function(params: any) {
+                  return params.percent >= 8 ? `${params.value}%` : '';
+                }
               },
               emphasis: {
                 label: {
                   show: true,
-                  fontSize: 12, // Adjust the font size of the emphasized label
+                  fontSize: 13,
                   fontWeight: 'bold'
+                },
+                itemStyle: {
+                  shadowBlur: 10,
+                  shadowOffsetX: 0,
+                  shadowColor: 'rgba(0, 0, 0, 0.3)'
                 }
               },
               labelLine: {
                 show: false
               },
-              data: final_data &&  final_data.map(item => {
+              data: final_data &&  final_data.map((item, index) => {
                 let color;
                 // Check for both French and Arabic labels for "Réalisé"/"محقق"
                 if (item.name === 'Réalisé' || item.name === 'محقق') {
-                    color = 'green'; // Assign green color to 'realisé' category
+                    color = '#22c55e'; // Modern green for completed
                 } else if (item.name === 'Reste' || item.name === 'باقي') {
-                    color = 'red'; // Assign red color to 'rest' category
+                    color = '#ef4444'; // Modern red for remaining
+                } else {
+                    color = this.colorList[index % this.colorList.length];
                 }
                 return {
                     value: typeof item.value === 'number' ? item.value.toFixed(1) : parseFloat(item.value).toFixed(1),
                     name: item.name,
                     itemStyle: {
-                        color: color // Apply the color to the itemStyle
+                        color: color,
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        shadowBlur: 3,
+                        shadowColor: 'rgba(0, 0, 0, 0.1)'
                     }
                 };
             })
@@ -277,37 +312,60 @@ this.labelOption = {
 
 this.option = {
   tooltip: {
-    trigger: 'item'
+    trigger: 'item',
+    backgroundColor: 'rgba(50, 50, 50, 0.95)',
+    borderColor: 'transparent',
+    textStyle: {
+      color: '#fff',
+      fontSize: 12,
+      fontFamily: 'Tahoma, sans-serif'
+    },
+    formatter: '{a} <br/>{b}: {c}% ({d}%)',
+    extraCssText: 'border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);'
   },
 
 
   legend: {
      top: '80%',
     left: 'center',
-    bottom: 0, 
+    bottom: 10, 
     textStyle: {
-      fontSize: 9 // Adjust the font size of the legend
-    }
-
+      fontSize: 10,
+      color: '#4a5568',
+      fontFamily: 'Tahoma, sans-serif'
+    },
+    itemWidth: 12,
+    itemHeight: 12,
+    itemGap: 8
   },
   series: [
     {
-      name: 'Access From',
+      name: 'Données',
       type: 'pie',
-      radius: ['25%', '60%'],
+      radius: ['35%', '55%'],
+      center: ['50%', '45%'],
       avoidLabelOverlap: false,
       label: {
-        show: true, // Set to true to show labels
-        position: 'inside', // Adjust the label position as per your requirement
-        distanceToLabelLine: -10, // Adjust the distance of the labels from the label lines
-
-        formatter: '{c}' // Format the label as per your requirement
+        show: true,
+        position: 'inside',
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#fff',
+        fontFamily: 'Tahoma, sans-serif',
+        formatter: function(params: any) {
+          return params.percent >= 8 ? `${params.value}%` : '';
+        }
       },
       emphasis: {
         label: {
           show: true,
-          fontSize: 12, // Adjust the font size of the emphasized label
+          fontSize: 13,
           fontWeight: 'bold'
+        },
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: 'rgba(0, 0, 0, 0.3)'
         }
       },
       labelLine: {
@@ -321,9 +379,13 @@ this.option = {
         { value: 300, name: 'Video Ads' }
       ],
       itemStyle: {
-        color:  (params: any)=> {
-          return colorList[params.dataIndex % colorList.length];
-        }
+        color: (params: any)=> {
+          return this.colorList[params.dataIndex % this.colorList.length];
+        },
+        borderColor: '#fff',
+        borderWidth: 2,
+        shadowBlur: 3,
+        shadowColor: 'rgba(0, 0, 0, 0.1)'
       }
     }
   ]

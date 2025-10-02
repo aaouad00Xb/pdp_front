@@ -220,7 +220,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2022).subscribe(
       res=>{
         console.error(res)
-        this.data =  res;
+        this.data = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -232,7 +232,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2023).subscribe(
       res=>{
         console.error(res)
-        this.data2 =  res;
+        this.data2 = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -243,7 +243,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2024).subscribe(
       res=>{
         console.error(res)
-        this.data3 =  res;
+        this.data3 = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -254,7 +254,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2025).subscribe(
       res=>{
         console.error(res)
-        this.data4 =  res;
+        this.data4 = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -265,7 +265,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2026).subscribe(
       res=>{
         console.error(res)
-        this.data5 =  res;
+        this.data5 = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -276,7 +276,7 @@ onObjectifsChange(event: Event): void {
     this.service.getPDPDataByAnneeRealisation(2027).subscribe(
       res=>{
         console.error(res)
-        this.data6 =  res;
+        this.data6 = this.languageDataService.transformDataForCurrentLanguage(res);
         },
       err=>
       console.error(err)
@@ -307,8 +307,13 @@ onObjectifsChange(event: Event): void {
     this.getchartData();
     this.getGeneralDataByYears(); // Also refresh filtered chart data
     
-    // Transform existing table data
-    this.updateDataForLanguage();
+    // Re-fetch table data with new language
+    this.getPDPDataByAnneeRealisation1();
+    this.getPDPDataByAnneeRealisation2();
+    this.getPDPDataByAnneeRealisation3();
+    this.getPDPDataByAnneeRealisation4();
+    this.getPDPDataByAnneeRealisation5();
+    this.getPDPDataByAnneeRealisation6();
   }
 
   private updateCachedChartData() {

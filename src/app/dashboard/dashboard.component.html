@@ -238,9 +238,10 @@
      </div>
      <div class="col-2 col-lg-2  col-md-6  col-sm-12    " *ngFor="let ele of keys">
   
-      <div class="card">
+      <div class="card pie-chart-card">
         <div class="card-body">
-          <app-pie2 [data1]="getTransformedPieData2(ele)" [label]="getTranslatedLabel(ele)" ></app-pie2>
+          <div class="pie-chart-title">{{ getTranslatedLabel(ele) }}</div>
+          <app-pie2 [data1]="getTransformedPieData2(ele)" ></app-pie2>
         </div>
       </div>
     

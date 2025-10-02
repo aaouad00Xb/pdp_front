@@ -116,6 +116,22 @@ export class ServiceService {
     public deletePDP_DATA(id:any):Observable<any>{
       return this.httpClient.delete<any>(`${this.apiUrl}/pdp_data/${id}`)
     }
+
+    // Excel upload and template methods
+    public uploadExcelFile(formData: FormData): Observable<any> {
+      const url = `${this.apiUrl}/pdp_data/upload-excel`;
+      return this.httpClient.post<any>(url, formData, {
+        reportProgress: true,
+        observe: 'events'
+      });
+    }
+
+    public downloadExcelTemplate(): Observable<Blob> {
+      const url = `${this.apiUrl}/pdp_data/download-template`;
+      return this.httpClient.get(url, {
+        responseType: 'blob'
+      });
+    }
     
 
     
