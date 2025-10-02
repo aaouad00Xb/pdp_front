@@ -14,7 +14,9 @@ export class DashboardComponent implements OnDestroy {
   generaldata: any;
   chartsData: any;
   axes: any;
+  axesWithMapping: {display: string, value: string}[] = [];
   objectifs: string[];
+  objectifsWithMapping: {display: string, value: string}[] = [];
   piesData: any;
   keys: string[];
   data: any[]=[];
@@ -29,6 +31,12 @@ export class DashboardComponent implements OnDestroy {
   private _transformedChartData: any = null;
   private _chartLegendLabels: string[] = [];
   private _lastLanguage: string = '';
+  
+  // Cached chart legends to avoid function calls in template
+  public cachedChartLegends: any = {};
+  public cachedTransformedPieData: any[] = [];
+  public cachedTransformedChartData: any = null;
+  public cachedChartLegendLabels: string[] = [];
 
 
 
@@ -37,6 +45,9 @@ constructor(
   private languageDataService: LanguageDataService,
   private translationService: TranslationService
 ) {
+
+  // Initialize cached chart legends
+  this.cachedChartLegends = this.languageDataService.getChartLegends();
 
   this.getAxces();
   this.getchartData()
@@ -67,8 +78,11 @@ constructor(
 
 
 getAxces(){
-  this.languageDataService.getAxes().subscribe(
-    res=> this.axes=res,
+  this.languageDataService.getAxesWithMapping().subscribe(
+    res => {
+      this.axesWithMapping = res;
+      this.axes = res.map(axe => axe.display); // Keep for backward compatibility
+    },
     err=>console.error(err)
   )
 }
@@ -76,57 +90,53 @@ getAxces(){
 
 onaxesChange(event: Event): void {
   const target = event.target as HTMLSelectElement;
-  const selectedYears = Array.from(target.selectedOptions).map(option => option.value);
+  const selectedAxes = Array.from(target.selectedOptions).map(option => option.value);
 
-  
-
-  if (selectedYears.length === 0) {
-    // Handle the case when no regions are selected
+  if (selectedAxes.length === 0) {
+    // Clear objectives and pie charts when no axes selected
+    this.objectifs = [];
+    this.piesData = null;
+    this.keys = [];
     return;
   }
 
-   
-
-
-  this.languageDataService.getObjectivesByAxes(selectedYears).subscribe(
-    res=>{
-       
-      this.objectifs=res;
-          },
-    err=>
-    console.error(err)
-    
-  )
-  
+  // Get objectives for selected axes with mapping for dropdown
+  console.log('Selected axes (from dropdown):', selectedAxes);
+  this.languageDataService.getObjectivesWithMapping(selectedAxes).subscribe(
+    res => {
+      console.log('Objectives mapping received:', res);
+      this.objectifsWithMapping = res;
+      this.objectifs = res.map(obj => obj.display); // Keep for backward compatibility
+    },
+    err => console.error('Error getting objectives:', err)
+  );
 }
 
 
 onObjectifsChange(event: Event): void {
   const target = event.target as HTMLSelectElement;
-  const selectedYears = Array.from(target.selectedOptions).map(option => option.value);
+  const selectedObjectifs = Array.from(target.selectedOptions).map(option => option.value);
 
-  
-
-  if (selectedYears.length === 0) {
-    // Handle the case when no regions are selected
+  if (selectedObjectifs.length === 0) {
+    // Clear pie charts when no objectives selected
+    this.piesData = null;
+    this.keys = [];
     return;
   }
 
-   
-
-
-  this.service.getObjectifPercentageByObjectifs(selectedYears).subscribe(
-    res=>{
-       
-      this.piesData = res
-      this.keys = Object.keys(res)
-      this.piesData.keys()
-          },
-    err=>
-    console.error(err)
-    
-  )
+  // The selectedObjectifs now contain the French values (from option.value)
+  // So we can use them directly for backend query
+  console.log('Selected objectives for backend:', selectedObjectifs);
   
+  this.service.getObjectifPercentageByObjectifs(selectedObjectifs).subscribe(
+    res => {
+      this.piesData = res;
+      this.keys = Object.keys(res);
+      console.log('Pie chart data received:', res);
+      console.log('Keys:', this.keys);
+    },
+    err => console.error(err)
+  );
 }
 
 
@@ -154,7 +164,9 @@ onObjectifsChange(event: Event): void {
   getchartData(){
     this.service.getChartDataWithArabic(this.years).subscribe(
       res=>{
-        this.chartsData = res
+        this.chartsData = res;
+        // Update cached data after chart data changes
+        this.updateCachedChartData();
             },
       err=>
       console.error(err)
@@ -236,12 +248,31 @@ onObjectifsChange(event: Event): void {
     this._chartLegendLabels = [];
     this._lastLanguage = this.translationService.getCurrentLanguage();
     
+    // Update cached chart legends and data
+    this.cachedChartLegends = this.languageDataService.getChartLegends();
+    this.updateCachedChartData();
+    
+    // Clear filtered data that needs to be re-selected
+    this.axes = [];
+    this.axesWithMapping = [];
+    this.objectifs = [];
+    this.objectifsWithMapping = [];
+    this.piesData = null;
+    this.keys = [];
+    
     // Re-fetch language-specific data
     this.getAxces();
     this.getchartData();
     
     // Transform existing table data
     this.updateDataForLanguage();
+  }
+
+  private updateCachedChartData() {
+    // Update cached transformed data
+    this.cachedTransformedPieData = this.getTransformedPieData();
+    this.cachedTransformedChartData = this.getTransformedChartData();
+    this.cachedChartLegendLabels = this.getChartLegendLabels();
   }
 
   updateDataForLanguage() {
@@ -275,9 +306,10 @@ onObjectifsChange(event: Event): void {
     return this.languageDataService.transformPieChartData(this.chartsData.piedata);
   }
 
-  getTransformedPieData2(key: string): any[] {
-    if (!this.piesData || !this.piesData[key]) return [];
-    return this.languageDataService.transformPieChartData(this.piesData[key]);
+  getTransformedPieData2(key: string): any {
+    if (!this.piesData || !this.piesData[key]) return {};
+    // Use the specific transformation for percentage pie chart data
+    return this.languageDataService.transformPercentagePieChartData({ [key]: this.piesData[key] });
   }
 
   getTranslatedLabel(label: string): string {

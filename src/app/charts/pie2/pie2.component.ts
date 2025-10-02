@@ -110,13 +110,14 @@ export class Pie2Component {
               },
               data: final_data &&  final_data.map(item => {
                 let color;
-                if (item.name === 'Réalisé') {
+                // Check for both French and Arabic labels for "Réalisé"/"محقق"
+                if (item.name === 'Réalisé' || item.name === 'محقق') {
                     color = 'green'; // Assign green color to 'realisé' category
-                } else if (item.name === 'Reste') {
+                } else if (item.name === 'Reste' || item.name === 'باقي') {
                     color = 'red'; // Assign red color to 'rest' category
                 }
                 return {
-                    value: item.value.toFixed(1),
+                    value: typeof item.value === 'number' ? item.value.toFixed(1) : parseFloat(item.value).toFixed(1),
                     name: item.name,
                     itemStyle: {
                         color: color // Apply the color to the itemStyle

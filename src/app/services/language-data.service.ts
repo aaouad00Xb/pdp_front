@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TranslationService } from './translation.service';
 import { ServiceService } from '../service.service';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, switchMap, of, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,39 @@ export class LanguageDataService {
       return this.serviceService.axesAr();
     } else {
       return this.serviceService.axes();
+    }
+  }
+
+  /**
+   * Get axes with both French and Arabic values for dropdown
+   * Returns array of objects with both display text and backend value
+   */
+  getAxesWithMapping(): Observable<{display: string, value: string}[]> {
+    const currentLang = this.translationService.getCurrentLanguage();
+    
+    if (currentLang === 'ar') {
+      // Get both French and Arabic axes
+      return this.serviceService.axes().pipe(
+        switchMap(frenchAxes => {
+          return this.serviceService.axesAr().pipe(
+            map(arabicAxes => {
+              // Create mapping objects
+              return frenchAxes.map((frenchAxe, index) => ({
+                display: arabicAxes[index] || frenchAxe, // Show Arabic if available, fallback to French
+                value: frenchAxe // Always use French for backend
+              }));
+            })
+          );
+        })
+      );
+    } else {
+      // For French, display and value are the same
+      return this.serviceService.axes().pipe(
+        map(axes => axes.map(axe => ({
+          display: axe,
+          value: axe
+        })))
+      );
     }
   }
 
@@ -207,5 +240,117 @@ export class LanguageDataService {
     };
     
     return translations[name] || name;
+  }
+
+  /**
+   * Convert selected axes to French for backend queries
+   * When Arabic axes are selected, convert them to French equivalents
+   */
+  private convertAxesToFrench(selectedAxes: string[]): Observable<string[]> {
+    const currentLang = this.translationService.getCurrentLanguage();
+    
+    if (currentLang === 'fr') {
+      // Already in French, return as-is
+      return of(selectedAxes);
+    }
+    
+    // For Arabic, we need to find the French equivalents
+    // Get all French axes and their Arabic translations, then map backwards
+    return this.serviceService.axes().pipe(
+      switchMap(frenchAxes => {
+        return this.serviceService.axesAr().pipe(
+          map(arabicAxes => {
+            const mapping: { [arabic: string]: string } = {};
+            
+            // Create a reverse mapping from Arabic to French
+            frenchAxes.forEach((frenchAxe, index) => {
+              if (arabicAxes[index]) {
+                mapping[arabicAxes[index]] = frenchAxe;
+              }
+            });
+            
+            // Convert selected Arabic axes to French
+            return selectedAxes.map(axe => mapping[axe] || axe);
+          })
+        );
+      })
+    );
+  }
+
+  /**
+   * Get objectives with both French and Arabic values for dropdown
+   * Returns array of objects with both display text and backend value
+   */
+  getObjectivesWithMapping(selectedAxes: string[]): Observable<{display: string, value: string}[]> {
+    // First convert axes to French for backend query
+    return this.convertAxesToFrench(selectedAxes).pipe(
+      switchMap(frenchAxes => this.getObjectivesWithMappingInternal(frenchAxes))
+    );
+  }
+
+  private getObjectivesWithMappingInternal(frenchAxes: string[]): Observable<{display: string, value: string}[]> {
+    const currentLang = this.translationService.getCurrentLanguage();
+    
+    if (currentLang === 'ar') {
+      // Get both French and Arabic objectives using French axes
+      return this.serviceService.findDistinctObjectifsByAxes(frenchAxes).pipe(
+        switchMap(frenchObjectifs => {
+          return this.serviceService.findDistinctObjectifsByAxesAr(frenchAxes).pipe(
+            map(arabicObjectifs => {
+              // Create mapping objects
+              return frenchObjectifs.map((frenchObj, index) => ({
+                display: arabicObjectifs[index] || frenchObj, // Show Arabic if available, fallback to French
+                value: frenchObj // Always use French for backend
+              }));
+            })
+          );
+        })
+      );
+    } else {
+      // For French, display and value are the same
+      return this.serviceService.findDistinctObjectifsByAxes(frenchAxes).pipe(
+        map(objectives => objectives.map(obj => ({
+          display: obj,
+          value: obj
+        })))
+      );
+    }
+  }
+
+  /**
+   * Transform percentage pie chart data (for filtered pie charts)
+   * Structure: { year: { "Réalisé": value, "Reste": value } }
+   * Returns object format expected by pie2 component
+   */
+  transformPercentagePieChartData(percentageData: any): any {
+    if (!percentageData) return {};
+
+    const currentLang = this.translationService.getCurrentLanguage();
+    
+    // Convert percentage data to pie chart format
+    const pieDataObject: { [key: string]: number } = {};
+    
+    for (const [key, value] of Object.entries(percentageData)) {
+      if (typeof value === 'object' && value !== null) {
+        const dataMap = value as { [key: string]: number };
+        
+        // Translate the labels
+        const realiseLabel = this.translationService.translate('dashboard.pieChartLabels.realise');
+        const resteLabel = this.translationService.translate('dashboard.pieChartLabels.reste');
+        
+        // Create pie chart data object with translated keys
+        if (dataMap['Réalisé'] !== undefined) {
+          pieDataObject[realiseLabel] = dataMap['Réalisé'];
+        }
+        if (dataMap['Reste'] !== undefined) {
+          pieDataObject[resteLabel] = dataMap['Reste'];
+        }
+        
+        // Only process the first entry for now (can be modified if needed)
+        break;
+      }
+    }
+    
+    return pieDataObject;
   }
 }

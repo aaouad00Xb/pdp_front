@@ -175,7 +175,7 @@
   
         <div class="card">
           <div class="card-body">
-            <app-pie [data1]="getTransformedPieData()"></app-pie>
+            <app-pie [data1]="cachedTransformedPieData"></app-pie>
           </div>
         </div>
       
@@ -184,7 +184,7 @@
   
         <div class="card">
           <div class="card-body">
-            <app-bar [data1]="generaldata.groupedSums" [legendLabels]="getChartLegends()"></app-bar>
+            <app-bar [data1]="generaldata.groupedSums" [legendLabels]="cachedChartLegends"></app-bar>
   
           </div>
         </div>
@@ -195,7 +195,7 @@
   
       <div class="card">
         <div class="card-body">
-          <app-bar2 [label]="getTransformedChartData()?.projetActions" [data1]="getTransformedChartData()?.dataset" [legendLabels]="getChartLegendLabels()"></app-bar2>
+          <app-bar2 [label]="cachedTransformedChartData?.projetActions" [data1]="cachedTransformedChartData?.dataset" [legendLabels]="cachedChartLegendLabels"></app-bar2>
   
         </div>
       </div>
@@ -216,7 +216,7 @@
           </div>
           <div class="card-body">
             <select style="font-size: 6px;height: 29vh;" class="form-select custom-select2" (change)="onaxesChange($event)"  multiple aria-label="Multiple select example">
-              <option [value]="ele" *ngFor="let ele of axes">{{ele}}</option>            
+              <option [value]="axe.value" *ngFor="let axe of axesWithMapping">{{axe.display}}</option>            
            </select>
           </div>
         </div>
@@ -230,7 +230,7 @@
           </div>
           <div class="card-body">
             <select style="height: 29vh;" class="form-select custom-select2" (change)="onObjectifsChange($event)" multiple aria-label="Multiple select example">
-              <option [value]="ele" *ngFor="let ele of objectifs">{{ele}}</option>
+              <option [value]="obj.value" *ngFor="let obj of objectifsWithMapping">{{obj.display}}</option>
             </select>
           </div>
         </div>

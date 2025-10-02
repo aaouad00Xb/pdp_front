@@ -51,6 +51,10 @@ export class TranslationService {
           cpContribution: 'Contribution du conseil préfectoral',
           estimatedCost: 'Coût estimé en Mds',
           partnerContribution: 'Contribution des partenaires'
+        },
+        pieChartLabels: {
+          realise: 'Réalisé',
+          reste: 'Reste'
         }
       },
       // Editor
@@ -138,6 +142,10 @@ export class TranslationService {
           cpContribution: 'مساهمة المجلس العمالي',
           estimatedCost: 'التكلفة المقدرة بالمليون درهم',
           partnerContribution: 'مساهمة الشركاء'
+        },
+        pieChartLabels: {
+          realise: 'محقق',
+          reste: 'باقي'
         }
       },
       // Editor
