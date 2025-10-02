@@ -76,7 +76,7 @@
                 <tr>
                   <td colSpan="12" style="text-align:center;font-weight: bolder; 
                   color: #E8751A;
-                  font-size: 26px;"> {{generaldata?.coutEstime.toFixed(3) }} </td>
+                  font-size: 26px;"> {{generaldata?.coutEstime?.toFixed(3) }} </td>
                 </tr>
     
                 </table>
@@ -97,7 +97,7 @@
                 <tr>
                   <td colSpan="12" style="text-align:center;font-weight: bolder; 
                   color: #E8751A;
-                  font-size: 26px;">{{generaldata?.partConseilPrefectoral.toFixed(3) }} </td>
+                  font-size: 26px;">{{generaldata?.partConseilPrefectoral?.toFixed(3) }} </td>
                 </tr>
     
                 </table>
@@ -117,7 +117,7 @@
                 <tr>
                   <td colSpan="12" style="text-align:center;font-weight: bolder; 
                   color: #E8751A;
-                  font-size: 26px;"> {{generaldata?.partPartenaire.toFixed(3) }}</td>
+                  font-size: 26px;"> {{generaldata?.partPartenaire?.toFixed(3) }}</td>
                 </tr>
     
                 </table>
@@ -143,9 +143,9 @@
                 </tr>
     
                 <tr>
-                  <td   style="text-align:center">        {{ele?.sumCoutEstime.toFixed(3)}} MDh </td>
-                  <td   style="text-align:center">        {{ele?. sumPartConseilPrefectoral.toFixed(3)}} MDh</td>
-                  <td style="text-align:center">        {{(ele?. sumPartConseilPrefectoral * 100/ ele?.sumCoutEstime).toFixed(3)}} %</td>
+                  <td   style="text-align:center">        {{ele?.sumCoutEstime?.toFixed(3)}} MDh </td>
+                  <td   style="text-align:center">        {{ele?.sumPartConseilPrefectoral?.toFixed(3)}} MDh</td>
+                  <td style="text-align:center">        {{(ele?.sumPartConseilPrefectoral * 100/ ele?.sumCoutEstime)?.toFixed(3)}} %</td>
                 </tr>
     
                 </table>
@@ -184,7 +184,7 @@
   
         <div class="card">
           <div class="card-body">
-            <app-bar [data1]="generaldata.groupedSums" [legendLabels]="cachedChartLegends"></app-bar>
+            <app-bar [data1]="generaldata?.groupedSums" [legendLabels]="cachedChartLegends"></app-bar>
   
           </div>
         </div>
