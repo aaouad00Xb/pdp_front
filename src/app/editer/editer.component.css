@@ -611,7 +611,9 @@
   }
 
   .upload-section .card-header {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: rgb(9,36,121);
+    background: linear-gradient(0deg, rgb(9, 35, 121) 0%, rgba(9, 28, 121, 0.808) 35%, rgba(0, 153, 255, 0.644) 100%);
+    color: #fff;
   }
 
   .upload-section input[type="file"] {

@@ -345,27 +345,27 @@
             
             <div class="upload-section">
               <div class="card">
-                <div class="card-header bg-info text-white">
-                  <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> Import de Données Excel</h5>
+                <div class="card-header">
+                  <h5 class="mb-0"><i class="bi bi-cloud-upload"></i> {{ 'editor.importTab' | translate }}</h5>
                 </div>
                 <div class="card-body">
                   <div class="row">
                     <div class="col-md-6">
-                      <label class="form-label">Télécharger un fichier Excel (.xlsx)</label>
+                      <label class="form-label">{{ 'editor.uploadExcelLabel' | translate }}</label>
                       <input type="file" 
                              class="form-control" 
                              accept=".xlsx,.xls" 
                              (change)="onFileSelected($event)"
                              #fileInput>
-                      <small class="text-muted">Format accepté: .xlsx, .xls (Max: 10MB)</small>
+                      <small class="text-muted">{{ 'editor.acceptedFormats' | translate }}</small>
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Télécharger le modèle</label>
+                      <label class="form-label">{{ 'editor.downloadTemplate' | translate }}</label>
                       <br>
                       <button class="btn btn-outline-info btn-sm" (click)="downloadTemplate()">
-                        <i class="bi bi-download"></i> Télécharger modèle Excel
+                        <i class="bi bi-download"></i> {{ 'editor.downloadTemplateBtn' | translate }}
                       </button>
-                      <small class="d-block text-muted mt-1">Utilisez ce modèle pour formater vos données</small>
+                      <small class="d-block text-muted mt-1">{{ 'editor.templateHint' | translate }}</small>
                     </div>
                   </div>
                   
@@ -382,26 +382,26 @@
 
                   <div class="mt-3" *ngIf="selectedFile">
                     <div class="alert alert-info">
-                      <strong>Fichier sélectionné:</strong> {{selectedFile.name}} ({{getFileSize(selectedFile.size)}})
+                      <strong>{{ 'editor.selectedFile' | translate }}:</strong> {{selectedFile.name}} ({{getFileSize(selectedFile.size)}})
                       <button class="btn btn-success btn-sm ms-2" (click)="uploadFile()" [disabled]="uploading">
                         <i class="bi bi-upload"></i> 
-                        <span *ngIf="!uploading">Importer</span>
-                        <span *ngIf="uploading">Importation...</span>
+                        <span *ngIf="!uploading">{{ 'editor.import' | translate }}</span>
+                        <span *ngIf="uploading">{{ 'editor.importing' | translate }}</span>
                       </button>
                       <button class="btn btn-secondary btn-sm ms-1" (click)="clearFile()">
-                        <i class="bi bi-x"></i> Annuler
+                        <i class="bi bi-x"></i> {{ 'common.cancel' | translate }}
                       </button>
                     </div>
                   </div>
 
                   <!-- Instructions -->
                   <div class="mt-4">
-                    <h6><i class="bi bi-info-circle"></i> Instructions:</h6>
+                    <h6><i class="bi bi-info-circle"></i> {{ 'editor.instructions' | translate }}</h6>
                     <ol class="small text-muted">
-                      <li>Téléchargez le modèle Excel pour voir le format requis</li>
-                      <li>Remplissez vos données dans le modèle</li>
-                      <li>Assurez-vous que toutes les colonnes obligatoires sont remplies</li>
-                      <li>Sélectionnez votre fichier et cliquez sur "Importer"</li>
+                      <li>{{ 'editor.step1' | translate }}</li>
+                      <li>{{ 'editor.step2' | translate }}</li>
+                      <li>{{ 'editor.step3' | translate }}</li>
+                      <li>{{ 'editor.step4' | translate }}</li>
                     </ol>
                   </div>
                 </div>
