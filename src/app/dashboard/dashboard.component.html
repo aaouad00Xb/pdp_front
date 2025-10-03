@@ -33,33 +33,43 @@
 
 <div class="content"  >
 
-    <!-- Highlight Card -->
-     <div class="container">
-      <div class="row bar"
-      style="
-        border-radius: 10px;
-        color: white;
-      ">
-      <div class="col-2 align-items-center" style=" text-align: center;">
-        <img src="assets/image.png" width="100px" alt="" style="display: block; margin: 0 auto;">
+    <!-- Compact Header -->
+    <div class="header-container">
+      <div class="header-bar bar">
+        <div class="header-content">
+          <!-- Left Logo -->
+          <div class="logo-section">
+            <img [src]="currentLeftLogo" alt="Logo Principal" class="header-logo-left">
+          </div>
+          
+          <!-- Title Section -->
+          <div class="title-section">
+            <h1 class="header-title">{{ getCurrentTitle() }}</h1>
+          </div>
+          
+          <!-- Controls Section -->
+          <div class="controls-section">
+            <div class="language-toggle-wrapper">
+              <app-language-toggle></app-language-toggle>
+            </div>
+            <div class="logo-section">
+              <img [src]="currentRightLogo" alt="Logo Secondaire" class="header-logo-right">
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="col-6 title"  > {{ 'dashboard.title' | translate }}
-      </div>
-      <div class="col-2 align-items-center" style="text-align: center;">
-        <app-language-toggle></app-language-toggle>
-      </div>
-      <div class="col-2 align-items-center" style="text-align: center;">
-        <img src="assets/image22.png" width="60px" alt="" style="display: block; margin: 0 auto;">
-      </div>
-  
-     
       
-      
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <div class="nav-content">
+          <span class="nav-title">{{ 'dashboard.title' | translate }}</span>
+          <button class="btn btn-login" [routerLink]="['/login']">
+            <i class="bi bi-box-arrow-in-right"></i>
+            {{ 'nav.login' | translate }}
+          </button>
+        </div>
+      </div>
     </div>
-    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">{{ 'dashboard.title' | translate }} <button class="btn btn-sm btn-success" [routerLink]="['/login']">{{ 'nav.login' | translate }}</button>
-    </h3>
-  
-     </div>
    
     <!-- Resources -->
   

@@ -1,31 +1,43 @@
 
 <div class="content"  >
 
-    <!-- Highlight Card -->
-     <div class="container">
-      <div class="row bar"
-      style="
-        border-radius: 10px;
-        color: white;
-      ">
-      <div class="col-2 align-items-center" style=" text-align: center;">
-        <img src="assets/image.png" width="100px" alt="" style="display: block; margin: 0 auto;">
+    <!-- Compact Header -->
+    <div class="header-container">
+      <div class="header-bar bar">
+        <div class="header-content">
+          <!-- Left Logo -->
+          <div class="logo-section">
+            <img [src]="currentLeftLogo" alt="Logo Principal" class="header-logo-left">
+          </div>
+          
+          <!-- Title Section -->
+          <div class="title-section">
+            <h1 class="header-title">{{ getCurrentTitle() }}</h1>
+          </div>
+          
+          <!-- Controls Section -->
+          <div class="controls-section">
+            <div class="language-toggle-wrapper">
+              <app-language-toggle></app-language-toggle>
+            </div>
+            <div class="logo-section">
+              <img [src]="currentRightLogo" alt="Logo Secondaire" class="header-logo-right">
+            </div>
       </div>
-      <div class="col-6 title"  > {{ 'editor.title' | translate }}
       </div>
-      <div class="col-2 align-items-center" style="text-align: center;">
-        <app-language-toggle></app-language-toggle>
       </div>
-      <div class="col-2 align-items-center" style="text-align: center;">
-        <img src="assets/image22.png" width="60px" alt="" style="display: block; margin: 0 auto;">
-      </div>
-  
-     
       
-      
+      <!-- Navigation Bar -->
+      <div class="nav-bar">
+        <div class="nav-content">
+          <span class="nav-title">{{ 'nav.editor' | translate }}</span>
+          <button class="btn btn-cancel" [routerLink]="['/dashboard']">
+            <i class="bi bi-arrow-left"></i>
+            {{ 'common.cancel' | translate }}
+          </button>
+        </div>
+      </div>
     </div>
-    <h3 style="text-align: center; background-color: rgba(255, 166, 0, 0.301);">{{ 'nav.editor' | translate }} <button class="btn btn-danger" [routerLink]="['/dashboard']">{{ 'common.cancel' | translate }}</button>
-    </h3>
   
      </div>
    
@@ -48,6 +60,13 @@
               <i class="bi bi-cloud-upload"></i> Import Excel
             </button>
           </li>
+          <li class="nav-item">
+            <button class="nav-link" 
+                    [class.active]="activeTab === 'settings'"
+                    (click)="activeTab = 'settings'">
+              <i class="bi bi-gear"></i> Paramètres
+            </button>
+          </li>
         </ul>
 
         <!-- Tab Content -->
@@ -56,8 +75,8 @@
           <!-- Debug info -->
           <div class="alert alert-info mb-3">
             <small>Active Tab: {{activeTab}} | Data Length: {{data?.length || 0}}</small>
-          </div>
-          
+        </div>
+
           <!-- Table Management Tab -->
           <div *ngIf="activeTab === 'table'">
            
@@ -296,7 +315,7 @@
             </tr>
         </tbody>
       </table>
-              </div>
+</div>
             </div>
 
             <!-- Pagination Controls -->
@@ -408,6 +427,135 @@
               </div>
             </div>
           </div>
-</div>
-    
+
+          <!-- Settings Tab -->
+          <div *ngIf="activeTab === 'settings'">
+            <div class="settings-section">
+              <h3><i class="bi bi-gear"></i> Paramètres de l'Application</h3>
+              
+              <!-- Logo Settings -->
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5><i class="bi bi-image"></i> Gestion des Logos</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <!-- Left Logo -->
+                    <div class="col-md-6">
+                      <h6>Logo Principal (Gauche)</h6>
+                      <div class="logo-preview mb-3">
+                        <img [src]="currentLeftLogo" alt="Logo Principal" class="img-thumbnail" style="max-width: 150px; max-height: 100px;">
+                      </div>
+                      <div class="mb-3">
+                        <label for="leftLogoFile" class="form-label">Changer le logo principal:</label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="leftLogoFile" 
+                               accept="image/*"
+                               (change)="onLeftLogoSelected($event)">
+                      </div>
+                      <button class="btn btn-primary btn-sm" 
+                              [disabled]="!selectedLeftLogo"
+                              (click)="uploadLeftLogo()">
+                        <i class="bi bi-upload"></i> Mettre à jour
+                      </button>
+                    </div>
+                    
+                    <!-- Right Logo -->
+                    <div class="col-md-6">
+                      <h6>Logo Secondaire (Droite)</h6>
+                      <div class="logo-preview mb-3">
+                        <img [src]="currentRightLogo" alt="Logo Secondaire" class="img-thumbnail" style="max-width: 150px; max-height: 100px;">
+                      </div>
+                      <div class="mb-3">
+                        <label for="rightLogoFile" class="form-label">Changer le logo secondaire:</label>
+                        <input type="file" 
+                               class="form-control" 
+                               id="rightLogoFile" 
+                               accept="image/*"
+                               (change)="onRightLogoSelected($event)">
+                      </div>
+                      <button class="btn btn-primary btn-sm" 
+                              [disabled]="!selectedRightLogo"
+                              (click)="uploadRightLogo()">
+                        <i class="bi bi-upload"></i> Mettre à jour
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Title Settings -->
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5><i class="bi bi-type"></i> Gestion du Titre</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="titleFr" class="form-label">Titre (Français):</label>
+                        <textarea class="form-control" 
+                                  id="titleFr" 
+                                  rows="3" 
+                                  [(ngModel)]="appSettings.titleFr"
+                                  placeholder="Programme de Développement Préfectoral de Rabat">
+                        </textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="titleAr" class="form-label">Titre (العربية):</label>
+                        <textarea class="form-control" 
+                                  id="titleAr" 
+                                  rows="3" 
+                                  dir="rtl"
+                                  [(ngModel)]="appSettings.titleAr"
+                                  placeholder="برنامج التنمية الإقليمية للرباط">
+                        </textarea>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Title Preview -->
+                  <div class="title-preview mb-3">
+                    <h6>Aperçu du titre:</h6>
+                    <div class="preview-box p-3 border rounded" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                      <div class="row align-items-center">
+                        <div class="col-2 text-center">
+                          <img [src]="currentLeftLogo" width="60px" alt="Logo" class="img-fluid">
+                        </div>
+                        <div class="col-8 text-center">
+                          <h4 class="mb-0" style="font-family: 'Tahoma', sans-serif;">
+                            {{ getCurrentTitle() }}
+                          </h4>
+                        </div>
+                        <div class="col-2 text-center">
+                          <img [src]="currentRightLogo" width="40px" alt="Logo" class="img-fluid">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <button class="btn btn-success" (click)="saveAppSettings()">
+                    <i class="bi bi-check-circle"></i> Sauvegarder les Paramètres
+                  </button>
+                </div>
+              </div>
+
+              <!-- Reset Settings -->
+              <div class="card">
+                <div class="card-header">
+                  <h5><i class="bi bi-arrow-clockwise"></i> Réinitialisation</h5>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted">Restaurer les paramètres par défaut de l'application.</p>
+                  <button class="btn btn-warning" (click)="resetToDefaults()">
+                    <i class="bi bi-arrow-clockwise"></i> Réinitialiser aux Valeurs par Défaut
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>

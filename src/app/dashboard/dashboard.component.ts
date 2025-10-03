@@ -2,6 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ServiceService } from '../service.service';
 import { LanguageDataService } from '../services/language-data.service';
 import { TranslationService } from '../services/translation.service';
+import { AppSettingsService, AppSettings } from '../services/app-settings.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -18,6 +19,7 @@ export class DashboardComponent implements OnDestroy {
   objectifs: string[];
   objectifsWithMapping: {display: string, value: string}[] = [];
   piesData: any;
+  appSettings: AppSettings;
   keys: string[];
   data: any[]=[];
   data6: any;
@@ -32,6 +34,20 @@ export class DashboardComponent implements OnDestroy {
   // Filtered general data for charts only (not summary cards)
   filteredGeneralData: any;
   private subscriptions: Subscription[] = [];
+
+  // Getter methods for dynamic content
+  getCurrentTitle(): string {
+    const currentLang = this.translationService.getCurrentLanguage();
+    return currentLang === 'ar' ? this.appSettings.titleAr : this.appSettings.titleFr;
+  }
+
+  get currentLeftLogo(): string {
+    return this.appSettings.leftLogo;
+  }
+
+  get currentRightLogo(): string {
+    return this.appSettings.rightLogo;
+  }
   
   // Cached transformed data
   private _transformedChartData: any = null;
@@ -49,8 +65,11 @@ export class DashboardComponent implements OnDestroy {
 constructor(
   private service: ServiceService,
   private languageDataService: LanguageDataService,
-  private translationService: TranslationService
+  private translationService: TranslationService,
+  private appSettingsService: AppSettingsService
 ) {
+  // Initialize app settings
+  this.appSettings = this.appSettingsService.getCurrentSettings();
 
   // Initialize cached chart legends
   this.cachedChartLegends = this.languageDataService.getChartLegends();
@@ -70,6 +89,12 @@ constructor(
     this.refreshAllDataForLanguage();
   });
   this.subscriptions.push(langSub);
+
+  // Subscribe to settings changes
+  const settingsSub = this.appSettingsService.settings$.subscribe(settings => {
+    this.appSettings = settings;
+  });
+  this.subscriptions.push(settingsSub);
 }
 
 

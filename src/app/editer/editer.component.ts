@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { ServiceService } from '../service.service';
 import { LanguageDataService } from '../services/language-data.service';
 import { TranslationService } from '../services/translation.service';
+import { AppSettingsService, AppSettings } from '../services/app-settings.service';
 import Swal from 'sweetalert2';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
@@ -47,13 +48,29 @@ export class EditerComponent implements OnDestroy {
   // Tab management
   activeTab: string = 'table';
 
+  // Settings properties
+  appSettings: AppSettings = {
+    titleFr: 'Programme de Développement Préfectoral de Rabat',
+    titleAr: 'برنامج التنمية الإقليمية للرباط',
+    leftLogo: 'assets/image.png',
+    rightLogo: 'assets/image22.png'
+  };
+
+  // Logo management
+  selectedLeftLogo: File | null = null;
+  selectedRightLogo: File | null = null;
+  previewLeftLogo: string | null = null;
+  previewRightLogo: string | null = null;
+
 constructor(
   private service: ServiceService,
   private languageDataService: LanguageDataService,
-  private translationService: TranslationService
+  private translationService: TranslationService,
+  private appSettingsService: AppSettingsService
 ) {
   console.log('EditerComponent constructor called');
   console.log('Initial activeTab:', this.activeTab);
+  this.loadSettingsFromService();
   this.gettingData()
   
   // Subscribe to language changes to update data display
@@ -61,6 +78,12 @@ constructor(
     this.updateDataForLanguage();
   });
   this.subscriptions.push(langSub);
+
+  // Subscribe to settings changes
+  const settingsSub = this.appSettingsService.settings$.subscribe(settings => {
+    this.appSettings = settings;
+  });
+  this.subscriptions.push(settingsSub);
 }
 @ViewChild('exportTable') exportTable: ElementRef<HTMLTableElement>;
 
@@ -110,39 +133,39 @@ exportTableToExcel(): void {
       }
     });
 
-    const table = this.exportTable.nativeElement;
-    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table);
+  const table = this.exportTable.nativeElement;
+  const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(table);
 
-    // Create a new workbook and add the worksheet
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Donnée PDP');
+  // Create a new workbook and add the worksheet
+  const wb: XLSX.WorkBook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Donnée PDP');
 
-    // Generate a Blob object containing the workbook
-    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  // Generate a Blob object containing the workbook
+  const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
     const data: Blob = new Blob([excelBuffer], { 
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' 
     });
 
-    const today = new Date();
+  const today = new Date();
 
-    // Array of French month names
-    const monthNames = [
-      "janvier", "février", "mars", "avril", "mai", "juin",
-      "juillet", "août", "septembre", "octobre", "novembre", "décembre"
-    ];
+  // Array of French month names
+  const monthNames = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre"
+  ];
 
-    // Get the month index (0-based) and retrieve the corresponding French month name
-    const monthIndex = today.getMonth();
-    const frenchMonth = monthNames[monthIndex];
+  // Get the month index (0-based) and retrieve the corresponding French month name
+  const monthIndex = today.getMonth();
+  const frenchMonth = monthNames[monthIndex];
 
-    // Format the date: YYYY-MM-DD
-    const dateFormatted = today.toISOString().slice(0, 10);
+  // Format the date: YYYY-MM-DD
+  const dateFormatted = today.toISOString().slice(0, 10);
 
-    // Construct the file name with the current date and French month
-    const fileName = `PDPDATA_${frenchMonth}_${dateFormatted}.xlsx`;
+  // Construct the file name with the current date and French month
+  const fileName = `PDPDATA_${frenchMonth}_${dateFormatted}.xlsx`;
 
     // Save the file
-    saveAs(data, fileName);
+  saveAs(data, fileName);
 
     // Close loading and show success
     Swal.close();
@@ -222,24 +245,24 @@ this.service.getData().subscribe(res=>{
   }
 
   updaterow(){
-    this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=>{
+this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=>{
       Swal.fire({
         title: 'Mise à jour réussie!',
         text: 'La ligne a été mise à jour avec succès',
         icon: 'success',
         confirmButtonText: 'OK'
       })
-      
-      this.gettingData()
-    },err=>{
+   
+  this.gettingData()
+},err=>{
       Swal.fire({
         title: 'Erreur de mise à jour',
         text: 'Erreur lors de la mise à jour de la ligne. Veuillez réessayer ultérieurement.',
         icon: 'error',
         confirmButtonText: 'OK'
       })
-      console.log(err)
-    })
+  console.log(err)
+})
   }
 
 
@@ -570,6 +593,242 @@ this.service.getData().subscribe(res=>{
         });
       }
     });
+  }
+
+  // Settings methods
+  getCurrentTitle(): string {
+    const currentLang = this.translationService.getCurrentLanguage();
+    return currentLang === 'ar' ? this.appSettings.titleAr : this.appSettings.titleFr;
+  }
+
+  get currentLeftLogo(): string {
+    return this.previewLeftLogo || this.appSettings.leftLogo;
+  }
+
+  get currentRightLogo(): string {
+    return this.previewRightLogo || this.appSettings.rightLogo;
+  }
+
+  onLeftLogoSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        Swal.fire({
+          title: 'Fichier invalide',
+          text: 'Veuillez sélectionner un fichier image valide',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          title: 'Fichier trop volumineux',
+          text: 'La taille du fichier ne doit pas dépasser 5MB',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      this.selectedLeftLogo = file;
+      
+      // Preview the selected image
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewLeftLogo = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  onRightLogoSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        Swal.fire({
+          title: 'Fichier invalide',
+          text: 'Veuillez sélectionner un fichier image valide',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire({
+          title: 'Fichier trop volumineux',
+          text: 'La taille du fichier ne doit pas dépasser 5MB',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
+      }
+
+      this.selectedRightLogo = file;
+      
+      // Preview the selected image
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.previewRightLogo = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  uploadLeftLogo(): void {
+    if (!this.selectedLeftLogo) return;
+
+    Swal.fire({
+      title: 'Confirmer la mise à jour',
+      text: 'Voulez-vous vraiment changer le logo principal?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, changer',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.performLogoUpload(this.selectedLeftLogo!, 'left');
+      }
+    });
+  }
+
+  uploadRightLogo(): void {
+    if (!this.selectedRightLogo) return;
+
+    Swal.fire({
+      title: 'Confirmer la mise à jour',
+      text: 'Voulez-vous vraiment changer le logo secondaire?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, changer',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.performLogoUpload(this.selectedRightLogo!, 'right');
+      }
+    });
+  }
+
+  private performLogoUpload(file: File, position: 'left' | 'right'): void {
+    Swal.fire({
+      title: 'Upload en cours...',
+      text: 'Téléchargement du logo',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // For now, we'll simulate the upload and save using the service
+    // In a real application, you would call a backend service
+    setTimeout(() => {
+      try {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const logoUrl = e.target.result;
+          
+          // Update the logo using the service
+          if (position === 'left') {
+            this.appSettingsService.updateLeftLogo(logoUrl);
+            this.selectedLeftLogo = null;
+            this.previewLeftLogo = null;
+          } else {
+            this.appSettingsService.updateRightLogo(logoUrl);
+            this.selectedRightLogo = null;
+            this.previewRightLogo = null;
+          }
+
+          Swal.close();
+          Swal.fire({
+            title: 'Logo mis à jour!',
+            text: `Le logo ${position === 'left' ? 'principal' : 'secondaire'} a été mis à jour avec succès`,
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        Swal.close();
+        Swal.fire({
+          title: 'Erreur',
+          text: 'Erreur lors de la mise à jour du logo',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    }, 1500);
+  }
+
+  saveAppSettings(): void {
+    Swal.fire({
+      title: 'Confirmer la sauvegarde',
+      text: 'Voulez-vous sauvegarder les paramètres de l\'application?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, sauvegarder',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          // Update settings using the service
+          this.appSettingsService.updateTitle(this.appSettings.titleFr, this.appSettings.titleAr);
+
+          Swal.fire({
+            title: 'Paramètres sauvegardés!',
+            text: 'Les paramètres de l\'application ont été sauvegardés avec succès',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          });
+        } catch (error) {
+          Swal.fire({
+            title: 'Erreur de sauvegarde',
+            text: 'Erreur lors de la sauvegarde des paramètres',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+        }
+      }
+    });
+  }
+
+  resetToDefaults(): void {
+    Swal.fire({
+      title: 'Confirmer la réinitialisation',
+      text: 'Cette action restaurera tous les paramètres par défaut. Continuer?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, réinitialiser',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Reset using the service
+        this.appSettingsService.resetToDefaults();
+        
+        // Clear preview states
+        this.selectedLeftLogo = null;
+        this.selectedRightLogo = null;
+        this.previewLeftLogo = null;
+        this.previewRightLogo = null;
+
+        Swal.fire({
+          title: 'Réinitialisation terminée!',
+          text: 'Tous les paramètres ont été restaurés aux valeurs par défaut',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+
+  private loadSettingsFromService(): void {
+    // Settings will be loaded automatically through the service subscription
+    this.appSettings = this.appSettingsService.getCurrentSettings();
   }
 }
  
