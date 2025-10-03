@@ -50,21 +50,21 @@
             <button class="nav-link" 
                     [class.active]="activeTab === 'table'"
                     (click)="activeTab = 'table'">
-              <i class="bi bi-table"></i> Gestion des Données
+              <i class="bi bi-table"></i> {{ 'editor.dataTab' | translate }}
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-link" 
                     [class.active]="activeTab === 'import'"
                     (click)="activeTab = 'import'">
-              <i class="bi bi-cloud-upload"></i> Import Excel
+              <i class="bi bi-cloud-upload"></i> {{ 'editor.importTab' | translate }}
             </button>
           </li>
           <li class="nav-item">
             <button class="nav-link" 
                     [class.active]="activeTab === 'settings'"
                     (click)="activeTab = 'settings'">
-              <i class="bi bi-gear"></i> Paramètres
+              <i class="bi bi-gear"></i> {{ 'editor.settingsTab' | translate }}
             </button>
           </li>
         </ul>
@@ -82,42 +82,23 @@
            
  
 
-            <!-- Action Buttons Section -->
-            <div class="action-buttons-section mb-4">
-              <div class="card">
-                <div class="card-header bg-primary text-white">
-                  <h6 class="mb-0"><i class="bi bi-tools"></i> Actions</h6>
-                </div>
-                <div class="card-body p-3">
-                  <div class="row g-3">
-                    <div class="col-md-6">
-                      <button class="btn btn-primary btn-action w-100" (click)="add()">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        <span>Ajouter une ligne</span>
-                      </button>
-                    </div>
-                    <div class="col-md-6">
-                      <button class="btn btn-success btn-action w-100" (click)="exportTableToExcel()">
-                        <i class="bi bi-file-earmark-spreadsheet me-2"></i>
-                        <span>Exporter Excel</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="row g-3 mt-2">
-                    <div class="col-12">
-                      <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded">
-                        <small class="text-muted">
-                          <i class="bi bi-info-circle me-1"></i>
-                          Total des enregistrements: <strong>{{data?.length || 0}}</strong>
-                        </small>
-                        <small class="text-muted">
-                          <i class="bi bi-funnel me-1"></i>
-                          Filtré: <strong>{{getAllFilteredData().length}}</strong>
-                        </small>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <!-- Minimal Action Toolbar -->
+            <div class="action-toolbar">
+              <div class="btn-group gap-2">
+                <button class="btn btn-outline-primary btn-sm" (click)="add()">
+                  <i class="bi bi-plus-circle me-1"></i>
+                  <span class="d-none d-sm-inline">{{ 'editor.addRow' | translate }}</span>
+                </button>
+                <button class="btn btn-outline-success btn-sm" (click)="exportTableToExcel()">
+                  <i class="bi bi-file-earmark-spreadsheet me-1"></i>
+                  <span class="d-none d-sm-inline">{{ 'editor.exportExcel' | translate }}</span>
+                </button>
+              </div>
+
+              <div class="action-stats">
+                <span class="stat-item"><i class="bi bi-info-circle me-1"></i>{{ 'editor.totalRecords' | translate }}: <strong>{{data?.length || 0}}</strong></span>
+                <span class="sep">•</span>
+                <span class="stat-item"><i class="bi bi-funnel me-1"></i>{{ 'editor.filtered' | translate }}: <strong>{{getAllFilteredData().length}}</strong></span>
               </div>
             </div>
 
@@ -125,23 +106,23 @@
             <div class="filters-section mb-3">
               <div class="row">
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.id" placeholder="Filtrer par ID">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.id" [placeholder]="('editor.filterById' | translate)">
                 </div>
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes" placeholder="Axes (FR)">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes" [placeholder]="('fields.axes' | translate) + ' (FR)'">
                 </div>
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes_ar" placeholder="المحاور" dir="rtl">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes_ar" [placeholder]="('fields.axes' | translate)" dir="rtl">
                 </div>
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif" placeholder="Objectifs (FR)">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif" [placeholder]="('fields.objectif' | translate) + ' (FR)'">
                 </div>
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif_ar" placeholder="الأهداف" dir="rtl">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.objectif_ar" [placeholder]="('fields.objectif' | translate)" dir="rtl">
                 </div>
                 <div class="col-md-2">
                   <select class="form-control form-control-sm" [(ngModel)]="filters.annee_realisation">
-                    <option value="">Toutes années</option>
+                    <option value="">{{ 'editor.allYears' | translate }}</option>
                     <option value="2022">2022</option>
                     <option value="2023">2023</option>
                     <option value="2024">2024</option>
@@ -153,19 +134,19 @@
               </div>
               <div class="row mt-2">
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action" placeholder="Projets (FR)">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action" [placeholder]="('fields.projetAction' | translate) + ' (FR)'">
                 </div>
                 <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action_ar" placeholder="المشاريع" dir="rtl">
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.projet_action_ar" [placeholder]="('fields.projetAction' | translate)" dir="rtl">
                 </div>
                 <div class="col-md-2">
                   <button class="btn btn-secondary btn-sm" (click)="clearFilters()">
-                    <i class="bi bi-x-circle"></i> Effacer
+                    <i class="bi bi-x-circle"></i> {{ 'common.clear' | translate }}
                   </button>
                 </div>
                 <div class="col-md-6 text-right">
                   <small class="text-muted">
-                    Affichage {{getStartIndex()}}-{{getEndIndex()}} sur {{getAllFilteredData().length}} éléments
+                    {{ 'editor.showing' | translate }} {{getStartIndex()}}-{{getEndIndex()}} {{ 'editor.of' | translate }} {{getAllFilteredData().length}} {{ 'editor.items' | translate }}
                   </small>
                 </div>
               </div>
@@ -431,23 +412,23 @@
           <!-- Settings Tab -->
           <div *ngIf="activeTab === 'settings'">
             <div class="settings-section">
-              <h3><i class="bi bi-gear"></i> Paramètres de l'Application</h3>
+              <h3><i class="bi bi-gear"></i> {{ 'editor.appSettings' | translate }}</h3>
               
               <!-- Logo Settings -->
               <div class="card mb-4">
                 <div class="card-header">
-                  <h5><i class="bi bi-image"></i> Gestion des Logos</h5>
+                  <h5><i class="bi bi-image"></i> {{ 'editor.logoManagement' | translate }}</h5>
                 </div>
                 <div class="card-body">
                   <div class="row">
                     <!-- Left Logo -->
                     <div class="col-md-6">
-                      <h6>Logo Principal (Gauche)</h6>
+                      <h6>{{ 'editor.leftLogo' | translate }}</h6>
                       <div class="logo-preview mb-3">
                         <img [src]="currentLeftLogo" alt="Logo Principal" class="img-thumbnail" style="max-width: 150px; max-height: 100px;">
                       </div>
                       <div class="mb-3">
-                        <label for="leftLogoFile" class="form-label">Changer le logo principal:</label>
+                        <label for="leftLogoFile" class="form-label">{{ 'editor.changeLeftLogo' | translate }}</label>
                         <input type="file" 
                                class="form-control" 
                                id="leftLogoFile" 
@@ -457,18 +438,18 @@
                       <button class="btn btn-primary btn-sm" 
                               [disabled]="!selectedLeftLogo"
                               (click)="uploadLeftLogo()">
-                        <i class="bi bi-upload"></i> Mettre à jour
+                        <i class="bi bi-upload"></i> {{ 'common.update' | translate }}
                       </button>
                     </div>
                     
                     <!-- Right Logo -->
                     <div class="col-md-6">
-                      <h6>Logo Secondaire (Droite)</h6>
+                      <h6>{{ 'editor.rightLogo' | translate }}</h6>
                       <div class="logo-preview mb-3">
                         <img [src]="currentRightLogo" alt="Logo Secondaire" class="img-thumbnail" style="max-width: 150px; max-height: 100px;">
                       </div>
                       <div class="mb-3">
-                        <label for="rightLogoFile" class="form-label">Changer le logo secondaire:</label>
+                        <label for="rightLogoFile" class="form-label">{{ 'editor.changeRightLogo' | translate }}</label>
                         <input type="file" 
                                class="form-control" 
                                id="rightLogoFile" 
@@ -478,7 +459,7 @@
                       <button class="btn btn-primary btn-sm" 
                               [disabled]="!selectedRightLogo"
                               (click)="uploadRightLogo()">
-                        <i class="bi bi-upload"></i> Mettre à jour
+                        <i class="bi bi-upload"></i> {{ 'common.update' | translate }}
                       </button>
                     </div>
                   </div>
@@ -488,13 +469,13 @@
               <!-- Title Settings -->
               <div class="card mb-4">
                 <div class="card-header">
-                  <h5><i class="bi bi-type"></i> Gestion du Titre</h5>
+                  <h5><i class="bi bi-type"></i> {{ 'editor.titleManagement' | translate }}</h5>
                 </div>
                 <div class="card-body">
                   <div class="row">
                     <div class="col-md-6">
                       <div class="mb-3">
-                        <label for="titleFr" class="form-label">Titre (Français):</label>
+                        <label for="titleFr" class="form-label">{{ 'editor.titleFr' | translate }}</label>
                         <textarea class="form-control" 
                                   id="titleFr" 
                                   rows="3" 
@@ -505,7 +486,7 @@
                     </div>
                     <div class="col-md-6">
                       <div class="mb-3">
-                        <label for="titleAr" class="form-label">Titre (العربية):</label>
+                        <label for="titleAr" class="form-label">{{ 'editor.titleAr' | translate }}</label>
                         <textarea class="form-control" 
                                   id="titleAr" 
                                   rows="3" 
@@ -519,7 +500,7 @@
                   
                   <!-- Title Preview -->
                   <div class="title-preview mb-3">
-                    <h6>Aperçu du titre:</h6>
+                    <h6>{{ 'editor.titlePreview' | translate }}</h6>
                     <div class="preview-box p-3 border rounded" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                       <div class="row align-items-center">
                         <div class="col-2 text-center">
@@ -538,20 +519,20 @@
                   </div>
                   
                   <button class="btn btn-success" (click)="saveAppSettings()">
-                    <i class="bi bi-check-circle"></i> Sauvegarder les Paramètres
+                    <i class="bi bi-check-circle"></i> {{ 'editor.saveSettings' | translate }}
                   </button>
                 </div>
-              </div>
-
+</div>
+    
               <!-- Reset Settings -->
               <div class="card">
                 <div class="card-header">
-                  <h5><i class="bi bi-arrow-clockwise"></i> Réinitialisation</h5>
+                  <h5><i class="bi bi-arrow-clockwise"></i> {{ 'editor.reset' | translate }}</h5>
                 </div>
                 <div class="card-body">
-                  <p class="text-muted">Restaurer les paramètres par défaut de l'application.</p>
+                  <p class="text-muted">{{ 'editor.resetHint' | translate }}</p>
                   <button class="btn btn-warning" (click)="resetToDefaults()">
-                    <i class="bi bi-arrow-clockwise"></i> Réinitialiser aux Valeurs par Défaut
+                    <i class="bi bi-arrow-clockwise"></i> {{ 'editor.resetToDefaults' | translate }}
                   </button>
                 </div>
               </div>

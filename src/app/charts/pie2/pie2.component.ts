@@ -92,11 +92,11 @@ export class Pie2Component {
              top: '80%',
             left: 'center',
             bottom: 5, 
-    textStyle: {
+            textStyle: {
       fontSize: 9,
       color: '#4a5568',
       fontFamily: 'Tahoma, sans-serif'
-    },
+            },
             formatter: function (name) {
               return name.toString().length > 20 ? name.toString().substring(0,20)+"..." : name.toString();
             },

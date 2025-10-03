@@ -601,6 +601,11 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
     return currentLang === 'ar' ? this.appSettings.titleAr : this.appSettings.titleFr;
   }
 
+  // Language helper for templates that need quick switching
+  isArabic(): boolean {
+    return this.translationService.getCurrentLanguage() === 'ar';
+  }
+
   get currentLeftLogo(): string {
     return this.previewLeftLogo || this.appSettings.leftLogo;
   }
