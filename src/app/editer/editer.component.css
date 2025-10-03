@@ -1053,7 +1053,9 @@
 }
 
 .settings-section .card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* Match app header gradient */
+  background: rgb(9,36,121);
+  background: linear-gradient(0deg, rgb(9, 35, 121) 0%, rgba(9, 28, 121, 0.808) 35%, rgba(0, 153, 255, 0.644) 100%);
   color: white;
   font-weight: 600;
   border: none;
