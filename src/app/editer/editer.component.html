@@ -53,14 +53,14 @@
               <i class="bi bi-table"></i> {{ 'editor.dataTab' | translate }}
             </button>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="isAdmin">
             <button class="nav-link" 
                     [class.active]="activeTab === 'import'"
                     (click)="activeTab = 'import'">
               <i class="bi bi-cloud-upload"></i> {{ 'editor.importTab' | translate }}
             </button>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" *ngIf="isAdmin">
             <button class="nav-link" 
                     [class.active]="activeTab === 'settings'"
                     (click)="activeTab = 'settings'">
@@ -339,7 +339,7 @@
           </div>
 
           <!-- Import Excel Tab -->
-          <div *ngIf="activeTab === 'import'">
+          <div *ngIf="activeTab === 'import' && isAdmin">
             <h3>Import Excel Content</h3>
             <p>This is the import tab content.</p>
             
@@ -410,7 +410,7 @@
           </div>
 
           <!-- Settings Tab -->
-          <div *ngIf="activeTab === 'settings'">
+          <div *ngIf="activeTab === 'settings' && isAdmin">
             <div class="settings-section">
               <h3><i class="bi bi-gear"></i> {{ 'editor.appSettings' | translate }}</h3>
               

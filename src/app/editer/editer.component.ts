@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { ServiceService } from '../service.service';
+import { UserServiceService } from '../user-service.service';
 import { LanguageDataService } from '../services/language-data.service';
 import { TranslationService } from '../services/translation.service';
 import { AppSettingsService, AppSettings } from '../services/app-settings.service';
@@ -47,6 +48,7 @@ export class EditerComponent implements OnDestroy {
 
   // Tab management
   activeTab: string = 'table';
+  isAdmin: boolean = false;
 
   // Settings properties
   appSettings: AppSettings = {
@@ -64,6 +66,7 @@ export class EditerComponent implements OnDestroy {
 
 constructor(
   private service: ServiceService,
+  private userService: UserServiceService,
   private languageDataService: LanguageDataService,
   private translationService: TranslationService,
   private appSettingsService: AppSettingsService
@@ -72,6 +75,7 @@ constructor(
   console.log('Initial activeTab:', this.activeTab);
   this.loadSettingsFromService();
   this.gettingData()
+  this.resolveUserRole();
   
   // Subscribe to language changes to update data display
   const langSub = this.translationService.currentLanguage$.subscribe(() => {
@@ -496,19 +500,34 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
   uploadFile(): void {
     if (!this.selectedFile) return;
 
-    Swal.fire({
-      title: 'Confirmer l\'import',
-      text: `Êtes-vous sûr de vouloir importer le fichier "${this.selectedFile.name}" ? Cette action ajoutera les données à la base de données.`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, importer',
-      cancelButtonText: 'Annuler',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.performUpload();
+    // Client-side validation before server upload
+    this.validateSelectedExcelFile(this.selectedFile).then(result => {
+      if (!result.valid) {
+        const html = `<div style="text-align:left;max-height:40vh;overflow:auto"><ul>${result.errors
+          .map(e => `<li>${e}</li>`).join('')}</ul></div>`;
+        Swal.fire({
+          title: 'Fichier invalide',
+          html,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+        return;
       }
+
+      Swal.fire({
+        title: 'Confirmer l\'import',
+        text: `Êtes-vous sûr de vouloir importer le fichier "${this.selectedFile!.name}" ? Cette action ajoutera les données à la base de données.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Oui, importer',
+        cancelButtonText: 'Annuler',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33'
+      }).then((dialog) => {
+        if (dialog.isConfirmed) {
+          this.performUpload();
+        }
+      });
     });
   }
 
@@ -545,7 +564,12 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
         
         Swal.fire({
           title: 'Import réussi!',
-          text: `Fichier importé avec succès! ${response.recordsProcessed} enregistrements traités.`,
+          html: `
+            <div style="text-align:left">
+              <p>Votre fichier a été vérifié et importé avec succès.</p>
+              <p><strong>${response.recordsProcessed || 0}</strong> enregistrements ont été ajoutés.</p>
+            </div>
+          `,
           icon: 'success',
           confirmButtonText: 'OK'
         });
@@ -556,13 +580,70 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
         this.uploadProgress = 0;
         this.uploadStatus = 'Erreur lors de l\'import';
         console.error('Upload error:', error);
+        const message = error?.error?.message || 'Erreur lors de l\'import du fichier. Vérifiez le format et réessayez.';
         Swal.fire({
-          title: 'Erreur d\'import',
-          text: 'Erreur lors de l\'import du fichier. Vérifiez le format et réessayez.',
+          title: 'Vérification échouée',
+          html: `<div style="text-align:left;max-height:40vh;overflow:auto">${message}</div>`,
           icon: 'error',
           confirmButtonText: 'OK'
         });
       }
+    });
+  }
+
+  // Validate Excel headers and required numeric fields on client side
+  private validateSelectedExcelFile(file: File): Promise<{ valid: boolean; errors: string[] }>{
+    const expectedHeaders = [
+      'ID','Axes (FR)','Axes (AR)','Objectif (FR)','Objectif (AR)',
+      'Projet/Action (FR)','Projet/Action (AR)','Coût Estimé',
+      'Part Conseil Préfectoral','Part Partenaire','Année Réalisation',
+      'Réalisé','Taux Réalisation Physique'
+    ];
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const sheetName = wb.SheetNames[0];
+          const sheet = wb.Sheets[sheetName];
+          const rows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, blankrows: false }) as any[][];
+          const errors: string[] = [];
+
+          if (!rows || rows.length === 0) {
+            resolve({ valid: false, errors: ['Le fichier est vide.'] });
+            return;
+          }
+          const headers = (rows[0] || []).map((h: any) => String(h || '').trim());
+          if (headers.length !== expectedHeaders.length || !expectedHeaders.every((h, i) => h === headers[i])) {
+            errors.push('Les en-têtes ne correspondent pas au modèle attendu. Téléchargez le modèle à jour.');
+          }
+
+          // Column indices for numeric validations in the provided template
+          const numericCols = [7,8,9,10,11,12];
+          for (let r = 1; r < rows.length; r++) {
+            const row = rows[r];
+            if (!row || row.length === 0) continue;
+            numericCols.forEach(ci => {
+              const val = row[ci];
+              const label = expectedHeaders[ci];
+              if (val === null || val === undefined || val === '') {
+                errors.push(`Ligne ${r+1}: la colonne "${label}" est obligatoire.`);
+              } else if (isNaN(Number(val))) {
+                errors.push(`Ligne ${r+1}: la colonne "${label}" doit être numérique.`);
+              } else if (Number(val) < 0) {
+                errors.push(`Ligne ${r+1}: la colonne "${label}" ne peut pas être négative.`);
+              }
+            });
+          }
+
+          resolve({ valid: errors.length === 0, errors });
+        } catch (err) {
+          resolve({ valid: false, errors: ['Impossible de lire le fichier Excel.'] });
+        }
+      };
+      reader.onerror = () => resolve({ valid: false, errors: ['Erreur de lecture du fichier.'] });
+      reader.readAsArrayBuffer(file);
     });
   }
 
@@ -834,6 +915,25 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
   private loadSettingsFromService(): void {
     // Settings will be loaded automatically through the service subscription
     this.appSettings = this.appSettingsService.getCurrentSettings();
+  }
+
+  private resolveUserRole(): void {
+    try {
+      const userIdStr = localStorage.getItem('user_id');
+      if (!userIdStr) { this.isAdmin = false; return; }
+      const userId = Number(userIdStr);
+      this.userService.getUser(userId).subscribe({
+        next: (user) => {
+          const role = (user?.role || user?.role?.name || '').toString();
+          this.isAdmin = role === 'ADMIN';
+        },
+        error: () => {
+          this.isAdmin = false;
+        }
+      });
+    } catch {
+      this.isAdmin = false;
+    }
   }
 }
  

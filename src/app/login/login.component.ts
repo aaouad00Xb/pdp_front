@@ -38,6 +38,9 @@ export class LoginComponent {
         
             this.service.setAccesToken(<string>this.authResponse.access_token);
             localStorage.setItem('access_token', res.access_token as string);
+            if (this.authResponse.userID) {
+              localStorage.setItem('user_id', String(this.authResponse.userID));
+            }
 
             this.router.navigate(['editer']);
 

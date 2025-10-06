@@ -254,7 +254,7 @@ export class TranslationService {
         partPartenaire: 'حصة الشريك',
         anneeRealisation: 'سنة الإنجاز',
         realise: 'المحقق',
-        tauxRealisationPhysique: 'معدل الإنجاز الفيزيائي'
+        tauxRealisationPhysique: 'معدل الإنجاز'
       },
       // Login
       login: {

@@ -386,7 +386,20 @@ onObjectifsChange(event: Event): void {
   }
 
   getTranslatedLabel(label: string): string {
-    return this.translationService.translate(`strategicAxes.${label}`) || label;
+    // Labels may arrive as 'strategicAxes.YYYY' or just 'YYYY'
+    const raw = String(label);
+    const parts = raw.split('.');
+    const lastPart = parts[parts.length - 1];
+
+    // If the last part is a 4-digit year, build a localized title like
+    // "Axes stratégiques 2024" or "المحاور الاستراتيجية 2024"
+    if (/^\d{4}$/.test(lastPart)) {
+      const prefix = this.translationService.translate('dashboard.byAxes');
+      return `${prefix} ${lastPart}`;
+    }
+
+    // Otherwise try to translate as a strategic axis name
+    return this.translationService.translate(`strategicAxes.${raw}`) || raw;
   }
 
   getTransformedChartData(): any {
