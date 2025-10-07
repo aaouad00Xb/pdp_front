@@ -122,7 +122,8 @@ export class ServiceService {
       const url = `${this.apiUrl}/pdp_data/upload-excel`;
       return this.httpClient.post<any>(url, formData, {
         reportProgress: true,
-        observe: 'events'
+        observe: 'events',
+        headers: new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`)
       });
     }
 
@@ -130,6 +131,7 @@ export class ServiceService {
       const url = `${this.apiUrl}/pdp_data/download-template`;
       return this.httpClient.get(url, {
         responseType: 'blob'
+        , headers: new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('access_token')}`)
       });
     }
     

@@ -137,7 +137,7 @@
        </div>
        <div class="row">
          
-        <div class="col-2 col-lg-2  col-md-4  col-sm-6    " *ngFor="let ele of generaldata?.groupedSums">
+        <div class="col-2 col-lg-2  col-md-4  col-sm-6    " *ngFor="let ele of getNonEmptyYearSums()">
           <div class="card card2">
             <div class="card-header">
               {{ele.anneeRealisation}}
@@ -203,7 +203,7 @@
   
      <div class="col-12 ">
   
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data)">
         <div class="card-body">
           <app-bar2 [label]="cachedTransformedChartData?.projetActions" [data1]="cachedTransformedChartData?.dataset" [legendLabels]="cachedChartLegendLabels"></app-bar2>
   
@@ -299,7 +299,7 @@
       </div>
       </div>
 
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data2)">
         
         <div class="card-header">
           2023
@@ -333,7 +333,7 @@
          </table>
       </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data3)">
         
         <div class="card-header">
           2024
@@ -367,7 +367,7 @@
          </table>
       </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data4)">
         
         <div class="card-header">
           2025
@@ -401,7 +401,7 @@
          </table>
       </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data5)">
         
         <div class="card-header">
           2026
@@ -437,7 +437,7 @@
       </div>
 
 
-      <div class="card">
+      <div class="card" *ngIf="hasYearTableData(data6)">
         
         <div class="card-header">
           2027

@@ -22,7 +22,6 @@ export class EditerComponent implements OnDestroy {
   
   // Filtering properties
   filters = {
-    id: '',
     axes: '',
     axes_ar: '',
     objectif: '',
@@ -327,7 +326,6 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
     
     let filteredData = this.data.filter(item => {
       return (
-        (!this.filters.id || item.id?.toString().toLowerCase().includes(this.filters.id.toLowerCase())) &&
         (!this.filters.axes || item.axes?.toLowerCase().includes(this.filters.axes.toLowerCase())) &&
         (!this.filters.axes_ar || item.axes_ar?.toLowerCase().includes(this.filters.axes_ar.toLowerCase())) &&
         (!this.filters.objectif || item.objectif?.toLowerCase().includes(this.filters.objectif.toLowerCase())) &&
@@ -372,7 +370,6 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
   // Clear all filters
   clearFilters(): void {
     this.filters = {
-      id: '',
       axes: '',
       axes_ar: '',
       objectif: '',
@@ -594,7 +591,7 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
   // Validate Excel headers and required numeric fields on client side
   private validateSelectedExcelFile(file: File): Promise<{ valid: boolean; errors: string[] }>{
     const expectedHeaders = [
-      'ID','Axes (FR)','Axes (AR)','Objectif (FR)','Objectif (AR)',
+      'Axes (FR)','Axes (AR)','Objectif (FR)','Objectif (AR)',
       'Projet/Action (FR)','Projet/Action (AR)','Coût Estimé',
       'Part Conseil Préfectoral','Part Partenaire','Année Réalisation',
       'Réalisé','Taux Réalisation Physique'
@@ -620,7 +617,8 @@ this.service.updatePDP_DATA(this.selectedrow.id,this.selectedrow).subscribe(res=
           }
 
           // Column indices for numeric validations in the provided template
-          const numericCols = [7,8,9,10,11,12];
+          // Note: Année Réalisation (index 11) is optional, so we don't validate it as required numeric
+          const numericCols = [6,7,8,10,11];
           for (let r = 1; r < rows.length; r++) {
             const row = rows[r];
             if (!row || row.length === 0) continue;

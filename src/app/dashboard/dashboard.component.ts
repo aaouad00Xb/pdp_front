@@ -425,6 +425,23 @@ onObjectifsChange(event: Event): void {
     return this._chartLegendLabels;
   }
 
+  // Utility: filter out empty years from summary cards
+  getNonEmptyYearSums(): any[] {
+    const list = this.generaldata?.groupedSums || [];
+    return list.filter((e: any) => {
+      const hasYear = e?.anneeRealisation !== null && e?.anneeRealisation !== undefined && String(e?.anneeRealisation).trim() !== '';
+      const total = Number(e?.sumCoutEstime || 0);
+      const cp = Number(e?.sumPartConseilPrefectoral || 0);
+      // Show only entries that have a valid year and at least one non-zero sum
+      return hasYear && (total > 0 || cp > 0);
+    });
+  }
+
+  // Utility: check if year table has any rows
+  hasYearTableData(arr: any[] | undefined): boolean {
+    return Array.isArray(arr) && arr.length > 0;
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }

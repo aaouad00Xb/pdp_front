@@ -50,8 +50,8 @@ export class Bar2Component implements OnChanges{
      if(this.data1){
       for(let ele of this.data1){
         ele?.data.forEach((item, index) => {
-          ele.data[index] = ele.data[index].toFixed(1);
-          // Adjust the number of decimal places as needed
+          const v = Number(ele.data[index] ?? 0);
+          ele.data[index] = Number.isFinite(v) ? Number(v.toFixed(3)) : v;
       });
 
        
@@ -85,7 +85,8 @@ export class Bar2Component implements OnChanges{
             trigger: 'axis',
             axisPointer: {
               type: 'shadow'
-            }
+            },
+            valueFormatter: (value: any) => Number(value ?? 0).toFixed(3)
           },
           legend: {
             data: this.legendLabels.length > 0 ? this.legendLabels : ['Côut estimé en Mds', 'Contribution du CP', 'Contribution des aprtenaires']
@@ -112,7 +113,10 @@ export class Bar2Component implements OnChanges{
           ],
           yAxis: [
             {
-              type: 'value'
+              type: 'value',
+              axisLabel: {
+                formatter: (value: any) => Number(value ?? 0).toFixed(3)
+              }
             }
           ],
           series: finaldata

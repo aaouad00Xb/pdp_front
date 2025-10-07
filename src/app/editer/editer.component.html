@@ -105,9 +105,7 @@
             <!-- Simple Filters -->
             <div class="filters-section mb-3">
               <div class="row">
-                <div class="col-md-2">
-                  <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.id" [placeholder]="('editor.filterById' | translate)">
-                </div>
+                
                 <div class="col-md-2">
                   <input type="text" class="form-control form-control-sm" [(ngModel)]="filters.axes" [placeholder]="('fields.axes' | translate) + ' (FR)'">
                 </div>
@@ -161,9 +159,6 @@
                       <th colspan="14">{{ 'editor.title' | translate }}</th>
           </tr>
           <tr>
-                      <th class="sortable" (click)="sortBy('id')">
-                        ID <i class="bi" [ngClass]="getSortIcon('id')"></i>
-                      </th>
                       <th class="french-col sortable" (click)="sortBy('axes')">
                         {{ 'fields.axes' | translate }} (FR) <i class="bi" [ngClass]="getSortIcon('axes')"></i>
                       </th>
@@ -191,6 +186,7 @@
                       <th class="sortable" (click)="sortBy('part_partenaire')">
                         {{ 'fields.partPartenaire' | translate }} <i class="bi" [ngClass]="getSortIcon('part_partenaire')"></i>
                       </th>
+                      
                       <th class="sortable" (click)="sortBy('annee_realisation')">
                         {{ 'fields.anneeRealisation' | translate }} <i class="bi" [ngClass]="getSortIcon('annee_realisation')"></i>
                       </th>
@@ -205,7 +201,6 @@
         </thead>
         <tbody>
                       <tr *ngFor="let ele of getFilteredData()" [ngClass]="{'table-warning': ele.expanded}">
-                        <td>{{ele.id}}</td>
                         
                         <!-- French Axes -->
                         <td class="french-cell" *ngIf="!ele.expanded">{{ele.axes}}</td>
@@ -258,6 +253,8 @@
                         <td *ngIf="ele.expanded">
                           <input type="number" class="form-control form-control-sm" [(ngModel)]="ele.part_partenaire">
                         </td>
+
+                        
 
                         <td *ngIf="!ele.expanded">{{ele.annee_realisation}}</td>
                         <td *ngIf="ele.expanded">

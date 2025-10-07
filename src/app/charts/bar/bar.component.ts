@@ -90,7 +90,10 @@ let partenaire = []
           },
           xAxis: {
             type: 'value',
-            boundaryGap: [0, 0.01]
+            boundaryGap: [0, 0.01],
+            axisLabel: {
+              formatter: (value: any) => Number(value ?? 0).toFixed(3)
+            }
           },
           yAxis: {
             type: 'category',
@@ -104,7 +107,7 @@ let partenaire = []
               label: {
                 show: true,
                 position: 'right',
-                formatter: '{c} MDH'
+                formatter: (params: any) => `${Number(params?.value ?? 0).toFixed(3)} MDH`
               }
             },
             {
@@ -114,7 +117,7 @@ let partenaire = []
               label: {
                 show: true,
                 position: 'right',
-                formatter: '{c} MDH'
+                formatter: (params: any) => `${Number(params?.value ?? 0).toFixed(3)} MDH`
               }
             }
           ]
@@ -247,11 +250,12 @@ this.option = {
   title: {
     text: 'World Population'
   },
-  tooltip: {
+          tooltip: {
     trigger: 'axis',
     axisPointer: {
       type: 'shadow'
-    }
+            },
+            valueFormatter: (value: any) => Number(value ?? 0).toFixed(3)
   },
   legend: {},
   grid: {
